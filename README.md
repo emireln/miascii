@@ -1,5 +1,7 @@
 <div align="center">
 
+<table align="center" border="0" cellpadding="0" cellspacing="0"><tr><td>
+
 ```
  ███▄ ▄███▓ ██▓ ▄▄▄        ██████  ▄████▄   ██▓ ██▓
 ▓██▒▀█▀ ██▒▓██▒▒████▄    ▒██    ▒ ▒██▀ ▀█  ▓██▒▓██▒
@@ -12,11 +14,13 @@
        ░    ░        ░  ░      ░  ░ ░       ░   ░
 ```
 
+</td></tr></table>
+
 ### **text · image · video → ascii art**
 
 **100% client-side** · no uploads · no tracking · no backend
 
-[![license](https://img.shields.io/badge/license-MIT-111?style=for-the-badge&labelColor=000)](./LICENSE)
+[![license](https://img.shields.io/badge/license-Apache--2.0-111?style=for-the-badge&labelColor=000)](./LICENSE)
 [![electron](https://img.shields.io/badge/electron-29-111?style=for-the-badge&labelColor=000&logo=electron&logoColor=fff)](https://www.electronjs.org/)
 [![react](https://img.shields.io/badge/react-18-111?style=for-the-badge&labelColor=000&logo=react&logoColor=fff)](https://react.dev/)
 [![vite](https://img.shields.io/badge/vite-5-111?style=for-the-badge&labelColor=000&logo=vite&logoColor=fff)](https://vitejs.dev/)
@@ -200,7 +204,7 @@ For big changes, open an issue first so we can align on scope.
 
 ## `> license`
 
-[MIT](./LICENSE) — do whatever, just keep the notice.
+[Apache-2.0](./LICENSE) — use it, fork it, ship it; keep the notice and don't sue the contributors.
 
 ---
 

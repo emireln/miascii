@@ -1,11 +1,12 @@
 {
   "name": "miascii",
   "private": true,
-  "version": "0.2.0",
+  "version": "0.2.1",
   "type": "module",
   "main": "electron/main.cjs",
   "description": "text · image · video to ASCII — fully client-side",
-  "author": "miascii",
+  "author": "ELN, Emir",
+  "license": "Apache-2.0",
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
