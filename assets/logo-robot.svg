@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Small-size variant: the robot mascot drawn on a TRANSPARENT background,
+  with no rounded container. Used at <=48px (taskbar, tray, installer title
+  bar, alt-tab, small Explorer, favicon) so the icon adapts cleanly to any
+  OS theme with no corner fringes from downscaling.
+
+  Same geometry as logo-mascot.svg (robot head), minus:
+   - the rounded black background
+   - the "m.i" wordmark
+   - the dark eye sockets (which would be opaque on a light taskbar)
+
+  At >=64px we use logo-mascot.svg which keeps the nice rounded-black square
+  — reads great on desktop / large Explorer views.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" shape-rendering="crispEdges">
+  <!-- Robot head, matching the mascot geometry exactly (16-col pixel grid
+       with 24px cells, origin 64 56). -->
+  <g fill="#ffffff" transform="translate(64 56)">
+    <!-- antenna -->
+    <rect x="180" y="-16"  width="24" height="48"/>
+    <rect x="168" y="-28"  width="48" height="16"/>
+
+    <!-- head outer border (interior stays transparent so eye area blends
+         with whatever the app/taskbar background is) -->
+    <rect x="48"  y="32"   width="288" height="24"/>
+    <rect x="24"  y="56"   width="336" height="24"/>
+    <rect x="24"  y="80"   width="24"  height="216"/>
+    <rect x="336" y="80"   width="24"  height="216"/>
+    <rect x="24"  y="296"  width="336" height="24"/>
+    <rect x="48"  y="320"  width="288" height="24"/>
+
+    <!-- eye frames: small open squares drawn as thin-stroked rects so the
+         sockets keep their pixel-art look even without a bg -->
+    <rect x="72"  y="120" width="72" height="72"
+          fill="none" stroke="#ffffff" stroke-width="12"/>
+    <rect x="240" y="120" width="72" height="72"
+          fill="none" stroke="#ffffff" stroke-width="12"/>
+
+    <!-- glowing pupils -->
+    <rect x="96"  y="144"  width="24"  height="24"/>
+    <rect x="264" y="144"  width="24"  height="24"/>
+
+    <!-- pixel smile :) -->
+    <rect x="96"  y="212"  width="24"  height="24"/>
+    <rect x="264" y="212"  width="24"  height="24"/>
+    <rect x="96"  y="236"  width="192" height="24"/>
+
+    <!-- ear / bolt details -->
+    <rect x="0"   y="168"  width="24"  height="48"/>
+    <rect x="360" y="168"  width="24"  height="48"/>
+  </g>
+</svg>

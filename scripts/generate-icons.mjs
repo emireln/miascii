@@ -18,7 +18,10 @@ const root = join(__dirname, '..')
 
 const MASCOT_SVG = join(root, 'assets', 'logo-mascot.svg')
 const MARK_SVG = join(root, 'assets', 'logo-mark.svg')
-const TRAY_SVG = join(root, 'assets', 'logo-tray.svg')
+// Robot-only, transparent-background variant used at small sizes so the
+// taskbar/tray/title-bar icon is ALWAYS the robot (not an "m.i" wordmark) and
+// adapts cleanly to both dark and light OS themes without corner fringes.
+const ROBOT_SVG = join(root, 'assets', 'logo-robot.svg')
 const LIGHT_SVG = join(root, 'assets', 'logo-mascot-light.svg')
 const BUILD = join(root, 'build')
 const PUBLIC = join(root, 'public')
@@ -66,13 +69,13 @@ async function main() {
     console.log(`   ${s}x${s}`)
   }
 
-  console.log('→ rasterizing small-size tray variants (transparent, no container)...')
-  const traySmall = {
-    16: await svgToPng(TRAY_SVG, 16),
-    24: await svgToPng(TRAY_SVG, 24),
-    32: await svgToPng(TRAY_SVG, 32),
-    48: await svgToPng(TRAY_SVG, 48),
-    64: await svgToPng(TRAY_SVG, 64),
+  console.log('→ rasterizing small-size robot variants (transparent bg, no container)...')
+  const robotSmall = {
+    16: await svgToPng(ROBOT_SVG, 16),
+    24: await svgToPng(ROBOT_SVG, 24),
+    32: await svgToPng(ROBOT_SVG, 32),
+    48: await svgToPng(ROBOT_SVG, 48),
+    64: await svgToPng(ROBOT_SVG, 64),
   }
 
   // Linux / electron-builder source
@@ -81,12 +84,12 @@ async function main() {
   // Dedicated tray icon (transparent bg, adapts to any taskbar color).
   //   build/           → used by electron-builder at build-time
   //   electron/assets/ → shipped INSIDE the packaged app for runtime use
-  await writeFile(join(BUILD, 'tray-icon.png'), traySmall[32])
-  await writeFile(join(BUILD, 'tray-icon@2x.png'), traySmall[64])
+  await writeFile(join(BUILD, 'tray-icon.png'), robotSmall[32])
+  await writeFile(join(BUILD, 'tray-icon@2x.png'), robotSmall[64])
   const electronAssets = join(root, 'electron', 'assets')
   await ensureDir(electronAssets)
-  await writeFile(join(electronAssets, 'tray-icon.png'), traySmall[32])
-  await writeFile(join(electronAssets, 'tray-icon@2x.png'), traySmall[64])
+  await writeFile(join(electronAssets, 'tray-icon.png'), robotSmall[32])
+  await writeFile(join(electronAssets, 'tray-icon@2x.png'), robotSmall[64])
   await writeFile(join(electronAssets, 'icon.png'), pngs[512])
 
   // PWA-style
@@ -100,10 +103,10 @@ async function main() {
   // and title bar render cleanly on both dark and light taskbars. The full
   // mascot (with rounded rect bg) kicks in at 64px+ for explorer/desktop.
   const icoBuffers = [
-    traySmall[16],
-    traySmall[24],
-    traySmall[32],
-    traySmall[48],
+    robotSmall[16],
+    robotSmall[24],
+    robotSmall[32],
+    robotSmall[48],
     pngs[64],
     pngs[128],
     pngs[256],
@@ -113,11 +116,11 @@ async function main() {
 
   // Favicon: reuse the exact same small buffers for a consistent browser tab
   const favIcoBuffers = [
-    traySmall[16],
-    traySmall[24],
-    traySmall[32],
-    traySmall[48],
-    traySmall[64],
+    robotSmall[16],
+    robotSmall[24],
+    robotSmall[32],
+    robotSmall[48],
+    robotSmall[64],
   ]
   await writeFile(join(PUBLIC, 'favicon.ico'), await toIco(favIcoBuffers))
 

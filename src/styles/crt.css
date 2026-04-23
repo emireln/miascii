@@ -65,6 +65,6 @@
   pointer-events: none;
   z-index: 9997;
   box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.55);
-  border-radius: 18px;
+  border-radius: 0;
 }
 :root.light .crt-curve { box-shadow: inset 0 0 80px rgba(0,0,0,0.15); }
