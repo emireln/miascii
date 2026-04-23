@@ -208,11 +208,13 @@ export default function SettingsPanel({ open, onClose }: Props) {
                         aria-hidden
                         style={{
                           display: 'inline-block',
-                          width: 16,
-                          height: 16,
-                          background: th.bg,
-                          borderRight: `8px solid ${th.fg}`,
-                          border: '1px solid currentColor',
+                          width: 18,
+                          height: 18,
+                          flexShrink: 0,
+                          // diagonal split: bg in upper-left, fg in lower-right
+                          background: `linear-gradient(135deg, ${th.bg} 0 50%, ${th.fg} 50% 100%)`,
+                          outline: '1px solid currentColor',
+                          outlineOffset: 0,
                         }}
                       />
                       <span className="truncate">{t(th.nameKey)}</span>
