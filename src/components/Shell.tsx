@@ -6,6 +6,7 @@ import {
 } from 'lucide-react'
 import { cn } from '../lib/cn'
 import { usePersisted } from '../lib/usePersisted'
+import { normalizeTheme, THEMES, type ThemeId } from '../lib/themes'
 import { useT } from '../i18n'
 import LanguageSwitcher from './LanguageSwitcher'
 import SettingsPanel from './SettingsPanel'
@@ -26,13 +27,17 @@ const MODES: { id: Mode; labelKey: string; icon: LucideIcon }[] = [
 
 export default function Shell({ mode, onMode, children }: Props) {
   const t = useT()
-  const [theme, setTheme] = usePersisted<'dark' | 'light'>('shell.theme', 'dark')
+  const [themeRaw, setTheme] = usePersisted<ThemeId>('shell.theme', 'default-dark')
+  const theme: ThemeId = normalizeTheme(themeRaw)
   const [navOpen, setNavOpen] = usePersisted<boolean>('shell.navOpen', true)
   const [settingsOpen, setSettingsOpen] = useState(false)
 
   useEffect(() => {
     const root = document.documentElement
-    if (theme === 'light') root.classList.add('light')
+    root.dataset.theme = theme
+    // Legacy .light class kept in sync for any older selectors still using it
+    const def = THEMES.find((t) => t.id === theme)
+    if (def?.mode === 'light') root.classList.add('light')
     else root.classList.remove('light')
   }, [theme])
 
@@ -66,11 +71,14 @@ export default function Shell({ mode, onMode, children }: Props) {
           <LanguageSwitcher />
           <button
             className="pixel-btn !px-2 !py-1"
-            onClick={() => setTheme((th) => (th === 'dark' ? 'light' : 'dark'))}
+            onClick={() => setTheme(theme === 'default-light' ? 'default-dark' : 'default-light')}
             aria-label={t('shell.toggleTheme')}
+            title={t('shell.toggleTheme')}
           >
-            {theme === 'dark' ? <Sun size={14} /> : <Moon size={14} />}
-            <span className="text-sm">{theme === 'dark' ? t('shell.theme.light') : t('shell.theme.dark')}</span>
+            {theme === 'default-light' ? <Moon size={14} /> : <Sun size={14} />}
+            <span className="text-sm">
+              {theme === 'default-light' ? t('shell.theme.dark') : t('shell.theme.light')}
+            </span>
           </button>
           <button
             className="pixel-btn !px-2 !py-1"

@@ -2,7 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
+:root,
+:root[data-theme="default-dark"] {
   --bg: #0a0a0a;
   --panel: #111111;
   --border: #2a2a2a;
@@ -14,7 +15,8 @@
   color-scheme: dark;
 }
 
-:root.light {
+:root.light,
+:root[data-theme="default-light"] {
   --bg: #ffffff;
   --panel: #ffffff;
   --border: #000000;
@@ -23,6 +25,84 @@
   --fg: #000000;
   --hi: #000000;
   --accent: #000000;
+  color-scheme: light;
+}
+
+/* Green phosphor — classic old CRT terminal */
+:root[data-theme="phosphor"] {
+  --bg: #000000;
+  --panel: #030a03;
+  --border: #0e2a14;
+  --dim: #1e6b2c;
+  --mid: #2fa84a;
+  --fg: #33ff66;
+  --hi: #a8ffb8;
+  --accent: #33ff66;
+  color-scheme: dark;
+}
+
+/* Amber — IBM 5151 / early monochrome monitors */
+:root[data-theme="amber"] {
+  --bg: #0b0600;
+  --panel: #120a00;
+  --border: #3a2000;
+  --dim: #7a5200;
+  --mid: #c08000;
+  --fg: #ffb000;
+  --hi: #ffd270;
+  --accent: #ffb000;
+  color-scheme: dark;
+}
+
+/* Synthwave — magenta on deep purple */
+:root[data-theme="synthwave"] {
+  --bg: #140425;
+  --panel: #1c0833;
+  --border: #3e0f6e;
+  --dim: #6b2f99;
+  --mid: #b055d6;
+  --fg: #ff2d95;
+  --hi: #ffc2e5;
+  --accent: #ff2d95;
+  color-scheme: dark;
+}
+
+/* Cyan terminal */
+:root[data-theme="cyan"] {
+  --bg: #000814;
+  --panel: #001322;
+  --border: #003a55;
+  --dim: #0a6b85;
+  --mid: #35aec7;
+  --fg: #00e6ff;
+  --hi: #aff6ff;
+  --accent: #00e6ff;
+  color-scheme: dark;
+}
+
+/* Red alert */
+:root[data-theme="alert"] {
+  --bg: #0a0000;
+  --panel: #140303;
+  --border: #3a0a0a;
+  --dim: #7a1a1a;
+  --mid: #bb3838;
+  --fg: #ff3b3b;
+  --hi: #ffb5b5;
+  --accent: #ff3b3b;
+  color-scheme: dark;
+}
+
+/* Paper — warm sepia, dark-on-cream */
+:root[data-theme="paper"] {
+  --bg: #f3ead9;
+  --panel: #fcf7ec;
+  --border: #2a1a05;
+  --dim: #8a7a5c;
+  --mid: #5c4a2a;
+  --fg: #2a1a05;
+  --hi: #1a0f00;
+  --accent: #2a1a05;
   color-scheme: light;
 }
 

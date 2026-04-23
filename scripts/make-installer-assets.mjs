@@ -76,9 +76,12 @@ async function makeBmp(outName, width, height) {
 
 async function main() {
   console.log('→ generating NSIS installer graphics from public/banner.png')
+  // Only the welcome/completion sidebars use the banner.
+  // We intentionally DO NOT generate installerHeader.bmp so NSIS falls back
+  // to its default header (plain) on the inner pages like "Choose Installation
+  // Options", where a stretched banner looks bad.
   await makeBmp('installerSidebar.bmp',     164, 314)
   await makeBmp('uninstallerSidebar.bmp',   164, 314)
-  await makeBmp('installerHeader.bmp',      150, 57)
   console.log('\n✓ installer graphics ready — next electron-builder run will bake them in')
 }
 

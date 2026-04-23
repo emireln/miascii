@@ -1,8 +1,9 @@
 import { useEffect, useRef, useState } from 'react'
-import { X, ExternalLink, Download, Upload, FolderOpen, Power, RotateCcw } from 'lucide-react'
+import { X, ExternalLink, Download, Upload, FolderOpen, Power, RotateCcw, Check } from 'lucide-react'
 import { useT } from '../i18n'
 import { usePersisted, clearPersisted } from '../lib/usePersisted'
 import { bridge, isElectron, type ElectronSettings } from '../lib/electronBridge'
+import { THEMES, normalizeTheme, type ThemeId } from '../lib/themes'
 import { Label, Slider, Toggle } from './Control'
 
 type Props = { open: boolean; onClose: () => void }
@@ -31,6 +32,8 @@ export default function SettingsPanel({ open, onClose }: Props) {
   const [crtIntensity, setCrtIntensity] = usePersisted<number>('ui.crtIntensity', 0)
   const [reduceMotion, setReduceMotion] = usePersisted<boolean>('ui.reduceMotion', false)
   const [uiScale, setUiScale] = usePersisted<number>('ui.scale', 100)
+  const [themeRaw, setTheme] = usePersisted<ThemeId>('shell.theme', 'default-dark')
+  const activeTheme = normalizeTheme(themeRaw)
 
   const importRef = useRef<HTMLInputElement>(null)
 
@@ -185,6 +188,42 @@ export default function SettingsPanel({ open, onClose }: Props) {
         {/* Appearance */}
         <section className="space-y-3">
           <Label>{`> ${t('settings.section.appearance')}`}</Label>
+
+          <div>
+            <Label>{t('settings.theme')}</Label>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+              {THEMES.map((th) => {
+                const active = th.id === activeTheme
+                return (
+                  <button
+                    key={th.id}
+                    type="button"
+                    onClick={() => setTheme(th.id)}
+                    className="pixel-btn !px-2 !py-1.5 !text-xs justify-between"
+                    data-active={active}
+                    title={t(th.nameKey)}
+                  >
+                    <span className="flex items-center gap-2 min-w-0">
+                      <span
+                        aria-hidden
+                        style={{
+                          display: 'inline-block',
+                          width: 16,
+                          height: 16,
+                          background: th.bg,
+                          borderRight: `8px solid ${th.fg}`,
+                          border: '1px solid currentColor',
+                        }}
+                      />
+                      <span className="truncate">{t(th.nameKey)}</span>
+                    </span>
+                    {active && <Check size={12} />}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+
           <div>
             <Label>{`${t('settings.crtIntensity')} (${crtIntensity}%)`}</Label>
             <Slider value={crtIntensity} onChange={setCrtIntensity} min={0} max={100} step={5} />

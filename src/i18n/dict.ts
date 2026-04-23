@@ -75,6 +75,15 @@ const en: Dict = {
   'settings.crtIntensity': 'CRT glow intensity',
   'settings.reduceMotion': 'reduce motion',
   'settings.uiScale': 'UI scale',
+  'settings.theme': 'theme',
+  'theme.defaultDark': 'default dark',
+  'theme.defaultLight': 'default light',
+  'theme.phosphor': 'green phosphor',
+  'theme.amber': 'amber',
+  'theme.synthwave': 'synthwave',
+  'theme.cyan': 'cyan terminal',
+  'theme.alert': 'red alert',
+  'theme.paper': 'paper',
   'settings.export': 'export all settings',
   'settings.import': 'import settings',
   'settings.revealFile': 'reveal settings file',
@@ -286,6 +295,16 @@ const es: Dict = {
   'video.recorderFailed': 'no se pudo iniciar el grabador',
   'video.cameraDenied': 'permiso de cámara denegado',
   'video.copyFrame': 'copiar cuadro',
+
+  'settings.theme': 'tema',
+  'theme.defaultDark': 'oscuro por defecto',
+  'theme.defaultLight': 'claro por defecto',
+  'theme.phosphor': 'fósforo verde',
+  'theme.amber': 'ámbar',
+  'theme.synthwave': 'synthwave',
+  'theme.cyan': 'terminal cian',
+  'theme.alert': 'alerta roja',
+  'theme.paper': 'papel',
 }
 
 // --- Portuguese (Brazil) ------------------------------------------------------
@@ -397,6 +416,16 @@ const ptBR: Dict = {
   'video.recorderFailed': 'falha ao iniciar o gravador',
   'video.cameraDenied': 'permissão de câmera negada',
   'video.copyFrame': 'copiar quadro',
+
+  'settings.theme': 'tema',
+  'theme.defaultDark': 'escuro padrão',
+  'theme.defaultLight': 'claro padrão',
+  'theme.phosphor': 'fósforo verde',
+  'theme.amber': 'âmbar',
+  'theme.synthwave': 'synthwave',
+  'theme.cyan': 'terminal ciano',
+  'theme.alert': 'alerta vermelho',
+  'theme.paper': 'papel',
 }
 
 // --- French -------------------------------------------------------------------
@@ -508,6 +537,16 @@ const fr: Dict = {
   'video.recorderFailed': 'impossible de démarrer l\'enregistreur',
   'video.cameraDenied': 'autorisation caméra refusée',
   'video.copyFrame': 'copier l\'image',
+
+  'settings.theme': 'thème',
+  'theme.defaultDark': 'sombre par défaut',
+  'theme.defaultLight': 'clair par défaut',
+  'theme.phosphor': 'phosphore vert',
+  'theme.amber': 'ambre',
+  'theme.synthwave': 'synthwave',
+  'theme.cyan': 'terminal cyan',
+  'theme.alert': 'alerte rouge',
+  'theme.paper': 'papier',
 }
 
 // --- German -------------------------------------------------------------------
@@ -619,6 +658,16 @@ const de: Dict = {
   'video.recorderFailed': 'aufnahme konnte nicht starten',
   'video.cameraDenied': 'kameraberechtigung abgelehnt',
   'video.copyFrame': 'bild kopieren',
+
+  'settings.theme': 'design',
+  'theme.defaultDark': 'standard dunkel',
+  'theme.defaultLight': 'standard hell',
+  'theme.phosphor': 'grüner phosphor',
+  'theme.amber': 'bernstein',
+  'theme.synthwave': 'synthwave',
+  'theme.cyan': 'cyan-terminal',
+  'theme.alert': 'alarmrot',
+  'theme.paper': 'papier',
 }
 
 // --- Italian ------------------------------------------------------------------
@@ -730,6 +779,16 @@ const it: Dict = {
   'video.recorderFailed': 'avvio registratore fallito',
   'video.cameraDenied': 'permesso fotocamera negato',
   'video.copyFrame': 'copia frame',
+
+  'settings.theme': 'tema',
+  'theme.defaultDark': 'scuro predefinito',
+  'theme.defaultLight': 'chiaro predefinito',
+  'theme.phosphor': 'fosforo verde',
+  'theme.amber': 'ambra',
+  'theme.synthwave': 'synthwave',
+  'theme.cyan': 'terminale ciano',
+  'theme.alert': 'allerta rossa',
+  'theme.paper': 'carta',
 }
 
 // --- Dutch --------------------------------------------------------------------
@@ -841,6 +900,16 @@ const nl: Dict = {
   'video.recorderFailed': 'opname kon niet starten',
   'video.cameraDenied': 'cameratoestemming geweigerd',
   'video.copyFrame': 'frame kopiëren',
+
+  'settings.theme': 'thema',
+  'theme.defaultDark': 'standaard donker',
+  'theme.defaultLight': 'standaard licht',
+  'theme.phosphor': 'groene fosfor',
+  'theme.amber': 'amber',
+  'theme.synthwave': 'synthwave',
+  'theme.cyan': 'cyan-terminal',
+  'theme.alert': 'rood alarm',
+  'theme.paper': 'papier',
 }
 
 // --- Russian ------------------------------------------------------------------
@@ -952,6 +1021,16 @@ const ru: Dict = {
   'video.recorderFailed': 'не удалось запустить запись',
   'video.cameraDenied': 'в доступе к камере отказано',
   'video.copyFrame': 'копир. кадр',
+
+  'settings.theme': 'тема',
+  'theme.defaultDark': 'тёмная по умолч.',
+  'theme.defaultLight': 'светлая по умолч.',
+  'theme.phosphor': 'зелёный фосфор',
+  'theme.amber': 'янтарь',
+  'theme.synthwave': 'synthwave',
+  'theme.cyan': 'циан-терминал',
+  'theme.alert': 'красная тревога',
+  'theme.paper': 'бумага',
 }
 
 // --- Japanese -----------------------------------------------------------------
@@ -1063,6 +1142,16 @@ const ja: Dict = {
   'video.recorderFailed': '録画開始に失敗',
   'video.cameraDenied': 'カメラ権限が拒否されました',
   'video.copyFrame': 'フレームをコピー',
+
+  'settings.theme': 'テーマ',
+  'theme.defaultDark': 'デフォルト（ダーク）',
+  'theme.defaultLight': 'デフォルト（ライト）',
+  'theme.phosphor': 'グリーン蛍光',
+  'theme.amber': 'アンバー',
+  'theme.synthwave': 'シンセウェーブ',
+  'theme.cyan': 'シアン端末',
+  'theme.alert': 'レッドアラート',
+  'theme.paper': 'ペーパー',
 }
 
 // --- Korean -------------------------------------------------------------------
@@ -1174,6 +1263,16 @@ const ko: Dict = {
   'video.recorderFailed': '녹화 시작 실패',
   'video.cameraDenied': '카메라 권한 거부됨',
   'video.copyFrame': '프레임 복사',
+
+  'settings.theme': '테마',
+  'theme.defaultDark': '기본 다크',
+  'theme.defaultLight': '기본 라이트',
+  'theme.phosphor': '그린 포스퍼',
+  'theme.amber': '앰버',
+  'theme.synthwave': '신스웨이브',
+  'theme.cyan': '시안 터미널',
+  'theme.alert': '레드 얼럿',
+  'theme.paper': '페이퍼',
 }
 
 // --- Chinese (Simplified) -----------------------------------------------------
@@ -1285,6 +1384,16 @@ const zh: Dict = {
   'video.recorderFailed': '无法启动录制器',
   'video.cameraDenied': '摄像头权限被拒绝',
   'video.copyFrame': '复制帧',
+
+  'settings.theme': '主题',
+  'theme.defaultDark': '默认深色',
+  'theme.defaultLight': '默认浅色',
+  'theme.phosphor': '绿色荧光',
+  'theme.amber': '琥珀',
+  'theme.synthwave': '合成波',
+  'theme.cyan': '青色终端',
+  'theme.alert': '红色警报',
+  'theme.paper': '纸张',
 }
 
 // --- Arabic (RTL) -------------------------------------------------------------
@@ -1396,6 +1505,16 @@ const ar: Dict = {
   'video.recorderFailed': 'فشل بدء المسجل',
   'video.cameraDenied': 'تم رفض إذن الكاميرا',
   'video.copyFrame': 'نسخ الإطار',
+
+  'settings.theme': 'السمة',
+  'theme.defaultDark': 'داكن افتراضي',
+  'theme.defaultLight': 'فاتح افتراضي',
+  'theme.phosphor': 'فوسفور أخضر',
+  'theme.amber': 'كهرماني',
+  'theme.synthwave': 'سينث ويف',
+  'theme.cyan': 'طرفية سماوية',
+  'theme.alert': 'إنذار أحمر',
+  'theme.paper': 'ورقي',
 }
 
 export const DICTIONARIES: Record<Locale, Dict> = {
