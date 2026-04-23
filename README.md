@@ -24,8 +24,6 @@
 
 <sub>A retro CRT-terminal app that turns anything into ASCII.  Runs in a browser, on your desktop, or without internet.</sub>
 
-<img src="public/banner.png" alt="miascii banner" width="100%" />
-
 </div>
 
 ---
