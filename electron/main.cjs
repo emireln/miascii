@@ -8,9 +8,26 @@ const fs = require('node:fs')
 const isDev = !app.isPackaged
 const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL || 'http://localhost:5173'
 
-const ICON_PATH = path.join(__dirname, '..', 'build', 'icon.png')
-const ICON_ICO = path.join(__dirname, '..', 'build', 'icon.ico')
-const TRAY_ICON_PNG = path.join(__dirname, '..', 'build', 'tray-icon.png')
+// Assets live in two places:
+//  - build/          used only at package time by electron-builder (installer
+//                    graphics + the .ico written into the exe resource table)
+//  - electron/assets shipped inside the asar so the RUNNING app can read them.
+// We try the bundled location first, falling back to the build/ copy for `npm
+// run electron:dev`.
+function resolveAsset(filename) {
+  const candidates = [
+    path.join(__dirname, 'assets', filename),       // packaged
+    path.join(__dirname, '..', 'build', filename),  // dev
+  ]
+  for (const p of candidates) {
+    try { fs.accessSync(p); return p } catch {}
+  }
+  return candidates[0] // return something; nativeImage will flag it empty
+}
+
+const ICON_PATH = resolveAsset('icon.png')
+const ICON_ICO = path.join(__dirname, '..', 'build', 'icon.ico') // only needed at package time
+const TRAY_ICON_PNG = resolveAsset('tray-icon.png')
 
 // --- Settings persistence ----------------------------------------------------
 // Stored in userData/settings.json. These are the electron-side settings;
@@ -132,14 +149,24 @@ function createWindow() {
 // --- Tray --------------------------------------------------------------------
 function createTray() {
   try {
-    // nativeImage gives Electron a proper multi-res image on each platform.
-    const img = nativeImage.createFromPath(TRAY_ICON_PNG)
+    let img = nativeImage.createFromPath(TRAY_ICON_PNG)
     if (img.isEmpty()) {
-      console.warn('tray icon image is empty, falling back to app icon')
+      console.warn(`tray icon empty at ${TRAY_ICON_PNG}, falling back to app icon`)
+      img = nativeImage.createFromPath(ICON_PATH)
     }
-    tray = new Tray(img.isEmpty() ? ICON_PATH : img)
+    if (img.isEmpty()) {
+      // No usable image at all — refuse to create an invisible tray, as that
+      // would leave the app with no way back from a close-to-tray.
+      throw new Error('no tray icon available')
+    }
+    tray = new Tray(img)
   } catch (e) {
-    console.error('failed to create tray', e)
+    console.error('failed to create tray — disabling close-to-tray as a safety net', e)
+    tray = null
+    // Force close-to-tray off so the next window close actually quits the app.
+    // Don't persist this flip — it's purely a runtime safety measure.
+    settings.closeToTray = false
+    settings.minimizeToTray = false
     return
   }
 
@@ -255,8 +282,8 @@ app.whenReady().then(() => {
 app.on('before-quit', () => { isQuitting = true })
 
 app.on('window-all-closed', () => {
-  // When close-to-tray is on, don't actually quit on window-all-closed —
-  // the user can bring the window back from the tray.
-  if (settings.closeToTray && !isQuitting) return
+  // Only stay alive on window-all-closed if close-to-tray is on AND a tray
+  // actually exists. Without a tray the app would be stuck invisible.
+  if (settings.closeToTray && tray && !isQuitting) return
   if (process.platform !== 'darwin') app.quit()
 })

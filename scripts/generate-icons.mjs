@@ -71,9 +71,16 @@ async function main() {
   // Linux / electron-builder source
   await writeFile(join(BUILD, 'icon.png'), pngs[512])
   await writeFile(join(BUILD, 'icon-1024.png'), pngs[1024])
-  // Dedicated tray icon (small, crisp)
+  // Dedicated tray icon (small, crisp) — write both places:
+  //   build/  → used by electron-builder at build-time
+  //   electron/assets/ → shipped INSIDE the packaged app for runtime use
   await writeFile(join(BUILD, 'tray-icon.png'), pngs[32])
   await writeFile(join(BUILD, 'tray-icon@2x.png'), pngs[64])
+  const electronAssets = join(root, 'electron', 'assets')
+  await ensureDir(electronAssets)
+  await writeFile(join(electronAssets, 'tray-icon.png'), pngs[32])
+  await writeFile(join(electronAssets, 'tray-icon@2x.png'), pngs[64])
+  await writeFile(join(electronAssets, 'icon.png'), pngs[512])
 
   // PWA-style
   await writeFile(join(PUBLIC, 'icon-192.png'), pngs[192])
