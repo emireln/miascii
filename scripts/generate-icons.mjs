@@ -18,6 +18,7 @@ const root = join(__dirname, '..')
 
 const MASCOT_SVG = join(root, 'assets', 'logo-mascot.svg')
 const MARK_SVG = join(root, 'assets', 'logo-mark.svg')
+const TRAY_SVG = join(root, 'assets', 'logo-tray.svg')
 const LIGHT_SVG = join(root, 'assets', 'logo-mascot-light.svg')
 const BUILD = join(root, 'build')
 const PUBLIC = join(root, 'public')
@@ -39,10 +40,14 @@ async function svgToPng(svgPath, size) {
   // density scales the internal rasterization; keep it high for large icons,
   // lower for small ones where super-sampling causes excessive blur.
   const density = size >= 256 ? 384 : size >= 64 ? 256 : 192
+  // Lanczos3 sharpens well but produces ringing on hard edges, which shows up
+  // as bright pixels fringing the rounded-rect corners at 16–32 px. Mitchell
+  // is a smoother cubic with minimal overshoot, perfect for high-contrast
+  // vector art shrunk to icon sizes.
   return sharp(svg, { density })
     .resize(size, size, {
       fit: 'contain',
-      kernel: 'lanczos3',
+      kernel: 'mitchell',
       background: { r: 0, g: 0, b: 0, alpha: 0 },
     })
     .png({ compressionLevel: 9, adaptiveFiltering: true })
@@ -61,25 +66,27 @@ async function main() {
     console.log(`   ${s}x${s}`)
   }
 
-  console.log('→ rasterizing small-size variants (mark) for crisp tray/taskbar...')
-  const markSmall = {
-    16: await svgToPng(MARK_SVG, 16),
-    24: await svgToPng(MARK_SVG, 24),
-    32: await svgToPng(MARK_SVG, 32),
+  console.log('→ rasterizing small-size tray variants (transparent, no container)...')
+  const traySmall = {
+    16: await svgToPng(TRAY_SVG, 16),
+    24: await svgToPng(TRAY_SVG, 24),
+    32: await svgToPng(TRAY_SVG, 32),
+    48: await svgToPng(TRAY_SVG, 48),
+    64: await svgToPng(TRAY_SVG, 64),
   }
 
   // Linux / electron-builder source
   await writeFile(join(BUILD, 'icon.png'), pngs[512])
   await writeFile(join(BUILD, 'icon-1024.png'), pngs[1024])
-  // Dedicated tray icon (small, crisp) — write both places:
-  //   build/  → used by electron-builder at build-time
+  // Dedicated tray icon (transparent bg, adapts to any taskbar color).
+  //   build/           → used by electron-builder at build-time
   //   electron/assets/ → shipped INSIDE the packaged app for runtime use
-  await writeFile(join(BUILD, 'tray-icon.png'), pngs[32])
-  await writeFile(join(BUILD, 'tray-icon@2x.png'), pngs[64])
+  await writeFile(join(BUILD, 'tray-icon.png'), traySmall[32])
+  await writeFile(join(BUILD, 'tray-icon@2x.png'), traySmall[64])
   const electronAssets = join(root, 'electron', 'assets')
   await ensureDir(electronAssets)
-  await writeFile(join(electronAssets, 'tray-icon.png'), pngs[32])
-  await writeFile(join(electronAssets, 'tray-icon@2x.png'), pngs[64])
+  await writeFile(join(electronAssets, 'tray-icon.png'), traySmall[32])
+  await writeFile(join(electronAssets, 'tray-icon@2x.png'), traySmall[64])
   await writeFile(join(electronAssets, 'icon.png'), pngs[512])
 
   // PWA-style
@@ -88,13 +95,15 @@ async function main() {
   await writeFile(join(PUBLIC, 'apple-touch-icon.png'), pngs[180])
 
   console.log('→ building Windows .ico (multi-resolution: 16/24/32/48/64/128/256)...')
-  // to-ico wants an array of PNG buffers at common Windows sizes.
-  // We use the 'mark' variant at <=32 so taskbar/explorer look sharp.
+  // to-ico wants an array of PNG buffers at common Windows sizes. Use the
+  // transparent "tray" variant for every size up to 48px so taskbar, alt-tab
+  // and title bar render cleanly on both dark and light taskbars. The full
+  // mascot (with rounded rect bg) kicks in at 64px+ for explorer/desktop.
   const icoBuffers = [
-    markSmall[16],
-    markSmall[24],
-    markSmall[32],
-    pngs[48],
+    traySmall[16],
+    traySmall[24],
+    traySmall[32],
+    traySmall[48],
     pngs[64],
     pngs[128],
     pngs[256],
@@ -102,13 +111,13 @@ async function main() {
   const ico = await toIco(icoBuffers)
   await writeFile(join(BUILD, 'icon.ico'), ico)
 
-  // Favicon: use mark at all sizes for compact browser-tab display
+  // Favicon: reuse the exact same small buffers for a consistent browser tab
   const favIcoBuffers = [
-    markSmall[16],
-    markSmall[24],
-    markSmall[32],
-    await svgToPng(MARK_SVG, 48),
-    await svgToPng(MARK_SVG, 64),
+    traySmall[16],
+    traySmall[24],
+    traySmall[32],
+    traySmall[48],
+    traySmall[64],
   ]
   await writeFile(join(PUBLIC, 'favicon.ico'), await toIco(favIcoBuffers))
 
