@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" shape-rendering="crispEdges">
+  <!-- Rounded square background (looks right as a desktop icon on every OS) -->
+  <rect width="512" height="512" rx="96" ry="96" fill="#0a0a0a"/>
+
+  <!-- Thin inner border -->
+  <rect x="16" y="16" width="480" height="480" rx="80" ry="80"
+        fill="none" stroke="#ffffff" stroke-width="4" stroke-opacity="0.35"/>
+
+  <!-- Pixel-art robot head, drawn on a 16-col grid; each cell = 24px -->
+  <!-- Origin (64, 56) so head occupies cols 2..14 rows 2..14 of a 16x16 art grid -->
+  <g fill="#ffffff" transform="translate(64 56)">
+    <!-- antenna -->
+    <rect x="180" y="-16"  width="24" height="48"/>
+    <rect x="168" y="-28"  width="48" height="16"/>
+
+    <!-- head outer (rounded via corner cuts) -->
+    <rect x="48"  y="32"   width="288" height="24"/>
+    <rect x="24"  y="56"   width="336" height="24"/>
+    <rect x="24"  y="80"   width="24"  height="216"/>
+    <rect x="336" y="80"   width="24"  height="216"/>
+    <rect x="24"  y="296"  width="336" height="24"/>
+    <rect x="48"  y="320"  width="288" height="24"/>
+
+    <!-- eye sockets (dark squares) -->
+    <rect x="72"  y="120"  width="72"  height="72"  fill="#0a0a0a"/>
+    <rect x="240" y="120"  width="72"  height="72"  fill="#0a0a0a"/>
+
+    <!-- glowing pupils -->
+    <rect x="96"  y="144"  width="24"  height="24"/>
+    <rect x="264" y="144"  width="24"  height="24"/>
+
+    <!-- pixel smile :) -->
+    <rect x="96"  y="212"  width="24"  height="24"/>
+    <rect x="264" y="212"  width="24"  height="24"/>
+    <rect x="96"  y="236"  width="192" height="24"/>
+
+    <!-- ear / bolt details -->
+    <rect x="0"   y="168"  width="24"  height="48"/>
+    <rect x="360" y="168"  width="24"  height="48"/>
+  </g>
+
+  <!-- m.i wordmark -->
+  <text x="256" y="456"
+        text-anchor="middle"
+        font-family="ui-monospace, 'SF Mono', Menlo, Consolas, monospace"
+        font-size="56"
+        font-weight="700"
+        letter-spacing="4"
+        fill="#ffffff">m.i</text>
+</svg>

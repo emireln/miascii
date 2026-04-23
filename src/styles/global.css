@@ -1,0 +1,151 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: #0a0a0a;
+  --panel: #111111;
+  --border: #2a2a2a;
+  --dim: #6b6b6b;
+  --mid: #a0a0a0;
+  --fg: #e6e6e6;
+  --hi: #ffffff;
+  --accent: #ffffff;
+  color-scheme: dark;
+}
+
+:root.light {
+  --bg: #ffffff;
+  --panel: #ffffff;
+  --border: #000000;
+  --dim: #8a8a8a;
+  --mid: #3a3a3a;
+  --fg: #000000;
+  --hi: #000000;
+  --accent: #000000;
+  color-scheme: light;
+}
+
+* { box-sizing: border-box; }
+
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'VT323', 'Fira Code', ui-monospace, monospace;
+  font-size: 18px;
+  line-height: 1.25;
+  -webkit-font-smoothing: none;
+  font-smooth: never;
+  image-rendering: pixelated;
+  overflow: hidden;
+}
+
+::selection {
+  background: var(--fg);
+  color: var(--bg);
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: var(--border); border: 2px solid var(--bg); }
+::-webkit-scrollbar-thumb:hover { background: var(--mid); }
+
+/* Pixel button */
+.pixel-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.45rem 0.9rem;
+  background: var(--panel);
+  color: var(--fg);
+  border: 2px solid var(--fg);
+  border-radius: 0;
+  font-family: 'VT323', monospace;
+  font-size: 1.1rem;
+  line-height: 1;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  cursor: pointer;
+  box-shadow: 4px 4px 0 0 var(--fg);
+  transition: transform 80ms ease, box-shadow 80ms ease, background 80ms ease;
+  user-select: none;
+}
+.pixel-btn:hover { background: var(--fg); color: var(--bg); }
+.pixel-btn:active { transform: translate(4px, 4px); box-shadow: 0 0 0 0 var(--fg); }
+.pixel-btn[data-active='true'] { background: var(--fg); color: var(--bg); }
+.pixel-btn:disabled { opacity: 0.45; cursor: not-allowed; box-shadow: 2px 2px 0 0 var(--border); }
+
+.pixel-panel {
+  background: var(--panel);
+  border: 2px solid var(--fg);
+  box-shadow: 4px 4px 0 0 var(--fg);
+}
+
+.pixel-input {
+  width: 100%;
+  background: transparent;
+  color: var(--fg);
+  border: none;
+  outline: none;
+  font-family: inherit;
+  font-size: 1.2rem;
+  caret-color: transparent;
+}
+
+/* Blinking cursor block */
+.caret::after {
+  content: '';
+  display: inline-block;
+  width: 0.55ch;
+  height: 1em;
+  background: var(--fg);
+  margin-left: 2px;
+  vertical-align: -2px;
+  animation: blink 1s steps(2, start) infinite;
+}
+@keyframes blink { to { visibility: hidden; } }
+
+/* Text glow */
+.glow {
+  text-shadow:
+    0 0 1px currentColor,
+    0 0 6px rgba(255,255,255,0.15);
+}
+:root.light .glow { text-shadow: none; }
+
+.divider {
+  border-top: 1px dashed var(--border);
+}
+
+/* Reduced motion — disables all transitions and animations app-wide */
+:root.reduce-motion *,
+:root.reduce-motion *::before,
+:root.reduce-motion *::after {
+  transition: none !important;
+  animation: none !important;
+}
+
+/* CRT glow overlay — driven by --crt-intensity (0..100, set via JS). */
+:root { --crt-intensity: 0; }
+.crt::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      rgba(0, 0, 0, calc(var(--crt-intensity) * 0.0035)) 0 2px,
+      transparent 2px 4px
+    );
+  mix-blend-mode: multiply;
+  opacity: calc(var(--crt-intensity) / 100);
+}
+:root.light .crt::before { mix-blend-mode: normal; opacity: calc(var(--crt-intensity) / 200); }

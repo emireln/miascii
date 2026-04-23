@@ -1,0 +1,53 @@
+{
+  "name": "miascii",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "electron/main.cjs",
+  "description": "text · image · video to ASCII — fully client-side",
+  "author": "miascii",
+  "scripts": {
+    "dev": "vite",
+    "build": "tsc && vite build",
+    "preview": "vite preview",
+    "electron": "electron .",
+    "electron:dev": "concurrently -k -n vite,electron -c blue,magenta \"vite\" \"wait-on http://localhost:5173 && cross-env VITE_DEV_SERVER_URL=http://localhost:5173 electron .\"",
+    "electron:build": "npm run build && electron-builder --config electron-builder.yml",
+    "electron:build:win": "npm run build && electron-builder --config electron-builder.yml --win",
+    "electron:build:mac": "npm run build && electron-builder --config electron-builder.yml --mac",
+    "electron:build:linux": "npm run build && electron-builder --config electron-builder.yml --linux",
+    "icons": "node scripts/generate-icons.mjs && node scripts/make-installer-assets.mjs",
+    "installer:assets": "node scripts/make-installer-assets.mjs"
+  },
+  "dependencies": {
+    "@fontsource/fira-code": "^5.0.18",
+    "@fontsource/press-start-2p": "^5.0.20",
+    "@fontsource/vt323": "^5.0.20",
+    "clsx": "^2.1.1",
+    "figlet": "^1.7.0",
+    "html2canvas": "^1.4.1",
+    "lucide-react": "^0.441.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "tailwind-merge": "^2.5.2",
+    "to-ico": "^1.1.5"
+  },
+  "devDependencies": {
+    "@types/figlet": "^1.5.8",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "autoprefixer": "^10.4.20",
+    "concurrently": "^8.2.2",
+    "cross-env": "^7.0.3",
+    "electron": "^29.4.6",
+    "electron-builder": "^24.13.3",
+    "png2icons": "^2.0.1",
+    "postcss": "^8.4.45",
+    "sharp": "^0.32.6",
+    "tailwindcss": "^3.4.10",
+    "typescript": "^5.5.4",
+    "vite": "^5.4.3",
+    "wait-on": "^8.0.1"
+  }
+}

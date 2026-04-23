@@ -1,0 +1,70 @@
+/* CRT scanline + vignette + subtle flicker overlay */
+.crt {
+  position: relative;
+  isolation: isolate;
+}
+
+.crt::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* Vignette + slight curvature shadow */
+.crt::after {
+  background:
+    radial-gradient(
+      ellipse at center,
+      transparent 55%,
+      rgba(0, 0, 0, 0.55) 100%
+    );
+  animation: crt-flicker 3.2s infinite steps(2);
+}
+
+:root.light .crt::after {
+  background: radial-gradient(
+    ellipse at center,
+    transparent 60%,
+    rgba(0, 0, 0, 0.18) 100%
+  );
+}
+
+@keyframes crt-flicker {
+  0%   { opacity: 0.85; }
+  50%  { opacity: 0.90; }
+  100% { opacity: 0.85; }
+}
+
+/* Moving scan line */
+.crt-scan {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9998;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(255, 255, 255, 0.04) 50%,
+    transparent 100%
+  );
+  background-size: 100% 6px;
+  animation: scan 6s linear infinite;
+}
+
+@keyframes scan {
+  from { transform: translateY(-100vh); }
+  to   { transform: translateY(100vh); }
+}
+
+/* Barely-there curvature via inset shadow */
+.crt-curve {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9997;
+  box-shadow: inset 0 0 120px rgba(0, 0, 0, 0.55);
+  border-radius: 18px;
+}
+:root.light .crt-curve { box-shadow: inset 0 0 80px rgba(0,0,0,0.15); }
