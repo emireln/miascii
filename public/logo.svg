@@ -1,42 +1,45 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" shape-rendering="crispEdges">
-  <!-- Rounded square background (looks right as a desktop icon on every OS) -->
-  <rect width="512" height="512" rx="96" ry="96" fill="#0a0a0a"/>
+<!--
+  miascii mascot v2 — rounded, iconic, minimal.
 
-  <!-- Thin inner border -->
-  <rect x="16" y="16" width="480" height="480" rx="80" ry="80"
-        fill="none" stroke="#ffffff" stroke-width="4" stroke-opacity="0.35"/>
+  Design direction inspired by Claude Code's icon: organic + smooth, instantly
+  readable silhouette, no fussy pixel-art detail. Single-color (white) features
+  on a deep-black rounded square, so the icon works the same whether the OS
+  taskbar / desktop is dark or light.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <!-- subtle top-to-bottom fade on the background, gives the icon a tiny
+         bit of depth without looking busy -->
+    <linearGradient id="mi-bg" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0"   stop-color="#1a1a1a"/>
+      <stop offset="1"   stop-color="#050505"/>
+    </linearGradient>
+  </defs>
 
-  <!-- Pixel-art robot head, drawn on a 16-col grid; each cell = 24px -->
-  <!-- Origin (64, 56) so head occupies cols 2..14 rows 2..14 of a 16x16 art grid -->
-  <g fill="#ffffff" transform="translate(64 56)">
-    <!-- antenna -->
-    <rect x="180" y="-16"  width="24" height="48"/>
-    <rect x="168" y="-28"  width="48" height="16"/>
+  <!-- dark rounded container (the "app chip") -->
+  <rect width="512" height="512" rx="112" ry="112" fill="url(#mi-bg)"/>
 
-    <!-- head outer (rounded via corner cuts) -->
-    <rect x="48"  y="32"   width="288" height="24"/>
-    <rect x="24"  y="56"   width="336" height="24"/>
-    <rect x="24"  y="80"   width="24"  height="216"/>
-    <rect x="336" y="80"   width="24"  height="216"/>
-    <rect x="24"  y="296"  width="336" height="24"/>
-    <rect x="48"  y="320"  width="288" height="24"/>
+  <!-- antenna: thin stem + rounded bulb -->
+  <rect x="244" y="72" width="24" height="56" rx="12" fill="#ffffff"/>
+  <circle cx="256" cy="62" r="18" fill="#ffffff"/>
 
-    <!-- eye sockets (dark squares) -->
-    <rect x="72"  y="120"  width="72"  height="72"  fill="#0a0a0a"/>
-    <rect x="240" y="120"  width="72"  height="72"  fill="#0a0a0a"/>
+  <!-- head: single smooth squircle, no pixel border noise -->
+  <rect x="104" y="132" width="304" height="296" rx="72" ry="72" fill="#ffffff"/>
 
-    <!-- glowing pupils -->
-    <rect x="96"  y="144"  width="24"  height="24"/>
-    <rect x="264" y="144"  width="24"  height="24"/>
+  <!-- ear / bolt knobs (slim, rounded) -->
+  <rect x="80"  y="240" width="28" height="80" rx="12" fill="#ffffff"/>
+  <rect x="404" y="240" width="28" height="80" rx="12" fill="#ffffff"/>
 
-    <!-- pixel smile :) -->
-    <rect x="96"  y="212"  width="24"  height="24"/>
-    <rect x="264" y="212"  width="24"  height="24"/>
-    <rect x="96"  y="236"  width="192" height="24"/>
+  <!-- friendly eyes: two solid dark dots on the white head, nothing scary -->
+  <circle cx="196" cy="256" r="22" fill="#0a0a0a"/>
+  <circle cx="316" cy="256" r="22" fill="#0a0a0a"/>
 
-    <!-- ear / bolt details -->
-    <rect x="0"   y="168"  width="24"  height="48"/>
-    <rect x="360" y="168"  width="24"  height="48"/>
-  </g>
+  <!-- tiny highlight on each eye so the robot looks awake, not dead -->
+  <circle cx="204" cy="248" r="6" fill="#ffffff"/>
+  <circle cx="324" cy="248" r="6" fill="#ffffff"/>
+
+  <!-- chill smile: slight upward curve, rounded -->
+  <path d="M 208 340 Q 256 370 304 340"
+        fill="none" stroke="#0a0a0a" stroke-width="14" stroke-linecap="round"/>
 </svg>

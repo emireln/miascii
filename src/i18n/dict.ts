@@ -94,6 +94,7 @@ const en: Dict = {
   'settings.about.version': 'version',
   'settings.about.tagline': 'text · image · video → ascii, fully client-side',
   'settings.about.repo': 'open website',
+  'settings.about.docs': 'documentation',
   'settings.desktop.only': '(desktop app only)',
 
   // Dropzone
@@ -191,6 +192,8 @@ const en: Dict = {
 const es: Dict = {
   'shell.toggleTheme': 'cambiar tema',
   'shell.support': 'apoyar',
+  'settings.about.repo': 'abrir sitio web',
+  'settings.about.docs': 'documentación',
   'shell.theme.light': 'CLARO',
   'shell.theme.dark': 'OSCURO',
   'shell.hideSidebar': 'ocultar barra lateral',
@@ -313,6 +316,8 @@ const es: Dict = {
 const ptBR: Dict = {
   'shell.toggleTheme': 'alternar tema',
   'shell.support': 'apoie',
+  'settings.about.repo': 'abrir site',
+  'settings.about.docs': 'documentação',
   'shell.theme.light': 'CLARO',
   'shell.theme.dark': 'ESCURO',
   'shell.hideSidebar': 'ocultar barra lateral',
@@ -435,6 +440,8 @@ const ptBR: Dict = {
 const fr: Dict = {
   'shell.toggleTheme': 'changer de thème',
   'shell.support': 'soutenir',
+  'settings.about.repo': 'ouvrir le site',
+  'settings.about.docs': 'documentation',
   'shell.theme.light': 'CLAIR',
   'shell.theme.dark': 'SOMBRE',
   'shell.hideSidebar': 'masquer la barre latérale',
@@ -557,6 +564,8 @@ const fr: Dict = {
 const de: Dict = {
   'shell.toggleTheme': 'design wechseln',
   'shell.support': 'unterstützen',
+  'settings.about.repo': 'webseite öffnen',
+  'settings.about.docs': 'dokumentation',
   'shell.theme.light': 'HELL',
   'shell.theme.dark': 'DUNKEL',
   'shell.hideSidebar': 'seitenleiste ausblenden',
@@ -679,6 +688,8 @@ const de: Dict = {
 const it: Dict = {
   'shell.toggleTheme': 'cambia tema',
   'shell.support': 'sostieni',
+  'settings.about.repo': 'apri sito web',
+  'settings.about.docs': 'documentazione',
   'shell.theme.light': 'CHIARO',
   'shell.theme.dark': 'SCURO',
   'shell.hideSidebar': 'nascondi barra laterale',
@@ -801,6 +812,8 @@ const it: Dict = {
 const nl: Dict = {
   'shell.toggleTheme': 'thema wisselen',
   'shell.support': 'steun',
+  'settings.about.repo': 'website openen',
+  'settings.about.docs': 'documentatie',
   'shell.theme.light': 'LICHT',
   'shell.theme.dark': 'DONKER',
   'shell.hideSidebar': 'zijbalk verbergen',
@@ -923,6 +936,8 @@ const nl: Dict = {
 const ru: Dict = {
   'shell.toggleTheme': 'сменить тему',
   'shell.support': 'поддержать',
+  'settings.about.repo': 'открыть сайт',
+  'settings.about.docs': 'документация',
   'shell.theme.light': 'СВЕТЛАЯ',
   'shell.theme.dark': 'ТЁМНАЯ',
   'shell.hideSidebar': 'скрыть панель',
@@ -1045,6 +1060,8 @@ const ru: Dict = {
 const ja: Dict = {
   'shell.toggleTheme': 'テーマ切替',
   'shell.support': 'サポート',
+  'settings.about.repo': 'ウェブサイトを開く',
+  'settings.about.docs': 'ドキュメント',
   'shell.theme.light': 'ライト',
   'shell.theme.dark': 'ダーク',
   'shell.hideSidebar': 'サイドバーを隠す',
@@ -1167,6 +1184,8 @@ const ja: Dict = {
 const ko: Dict = {
   'shell.toggleTheme': '테마 전환',
   'shell.support': '후원',
+  'settings.about.repo': '웹사이트 열기',
+  'settings.about.docs': '문서',
   'shell.theme.light': '라이트',
   'shell.theme.dark': '다크',
   'shell.hideSidebar': '사이드바 숨기기',
@@ -1289,6 +1308,8 @@ const ko: Dict = {
 const zh: Dict = {
   'shell.toggleTheme': '切换主题',
   'shell.support': '支持',
+  'settings.about.repo': '打开网站',
+  'settings.about.docs': '文档',
   'shell.theme.light': '浅色',
   'shell.theme.dark': '深色',
   'shell.hideSidebar': '隐藏侧边栏',
@@ -1411,6 +1432,8 @@ const zh: Dict = {
 const ar: Dict = {
   'shell.toggleTheme': 'تبديل السمة',
   'shell.support': 'ادعم',
+  'settings.about.repo': 'فتح الموقع',
+  'settings.about.docs': 'التوثيق',
   'shell.theme.light': 'فاتح',
   'shell.theme.dark': 'داكن',
   'shell.hideSidebar': 'إخفاء الشريط الجانبي',
