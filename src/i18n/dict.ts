@@ -31,6 +31,7 @@ type Dict = Record<string, string>
 const en: Dict = {
   // Shell / chrome
   'shell.toggleTheme': 'toggle theme',
+  'shell.support': 'support',
   'shell.theme.light': 'LIGHT',
   'shell.theme.dark': 'DARK',
   'shell.hideSidebar': 'hide sidebar',
@@ -189,6 +190,7 @@ const en: Dict = {
 // --- Spanish ------------------------------------------------------------------
 const es: Dict = {
   'shell.toggleTheme': 'cambiar tema',
+  'shell.support': 'apoyar',
   'shell.theme.light': 'CLARO',
   'shell.theme.dark': 'OSCURO',
   'shell.hideSidebar': 'ocultar barra lateral',
@@ -310,6 +312,7 @@ const es: Dict = {
 // --- Portuguese (Brazil) ------------------------------------------------------
 const ptBR: Dict = {
   'shell.toggleTheme': 'alternar tema',
+  'shell.support': 'apoie',
   'shell.theme.light': 'CLARO',
   'shell.theme.dark': 'ESCURO',
   'shell.hideSidebar': 'ocultar barra lateral',
@@ -431,6 +434,7 @@ const ptBR: Dict = {
 // --- French -------------------------------------------------------------------
 const fr: Dict = {
   'shell.toggleTheme': 'changer de thème',
+  'shell.support': 'soutenir',
   'shell.theme.light': 'CLAIR',
   'shell.theme.dark': 'SOMBRE',
   'shell.hideSidebar': 'masquer la barre latérale',
@@ -552,6 +556,7 @@ const fr: Dict = {
 // --- German -------------------------------------------------------------------
 const de: Dict = {
   'shell.toggleTheme': 'design wechseln',
+  'shell.support': 'unterstützen',
   'shell.theme.light': 'HELL',
   'shell.theme.dark': 'DUNKEL',
   'shell.hideSidebar': 'seitenleiste ausblenden',
@@ -673,6 +678,7 @@ const de: Dict = {
 // --- Italian ------------------------------------------------------------------
 const it: Dict = {
   'shell.toggleTheme': 'cambia tema',
+  'shell.support': 'sostieni',
   'shell.theme.light': 'CHIARO',
   'shell.theme.dark': 'SCURO',
   'shell.hideSidebar': 'nascondi barra laterale',
@@ -794,6 +800,7 @@ const it: Dict = {
 // --- Dutch --------------------------------------------------------------------
 const nl: Dict = {
   'shell.toggleTheme': 'thema wisselen',
+  'shell.support': 'steun',
   'shell.theme.light': 'LICHT',
   'shell.theme.dark': 'DONKER',
   'shell.hideSidebar': 'zijbalk verbergen',
@@ -915,6 +922,7 @@ const nl: Dict = {
 // --- Russian ------------------------------------------------------------------
 const ru: Dict = {
   'shell.toggleTheme': 'сменить тему',
+  'shell.support': 'поддержать',
   'shell.theme.light': 'СВЕТЛАЯ',
   'shell.theme.dark': 'ТЁМНАЯ',
   'shell.hideSidebar': 'скрыть панель',
@@ -1036,6 +1044,7 @@ const ru: Dict = {
 // --- Japanese -----------------------------------------------------------------
 const ja: Dict = {
   'shell.toggleTheme': 'テーマ切替',
+  'shell.support': 'サポート',
   'shell.theme.light': 'ライト',
   'shell.theme.dark': 'ダーク',
   'shell.hideSidebar': 'サイドバーを隠す',
@@ -1157,6 +1166,7 @@ const ja: Dict = {
 // --- Korean -------------------------------------------------------------------
 const ko: Dict = {
   'shell.toggleTheme': '테마 전환',
+  'shell.support': '후원',
   'shell.theme.light': '라이트',
   'shell.theme.dark': '다크',
   'shell.hideSidebar': '사이드바 숨기기',
@@ -1278,6 +1288,7 @@ const ko: Dict = {
 // --- Chinese (Simplified) -----------------------------------------------------
 const zh: Dict = {
   'shell.toggleTheme': '切换主题',
+  'shell.support': '支持',
   'shell.theme.light': '浅色',
   'shell.theme.dark': '深色',
   'shell.hideSidebar': '隐藏侧边栏',
@@ -1399,6 +1410,7 @@ const zh: Dict = {
 // --- Arabic (RTL) -------------------------------------------------------------
 const ar: Dict = {
   'shell.toggleTheme': 'تبديل السمة',
+  'shell.support': 'ادعم',
   'shell.theme.light': 'فاتح',
   'shell.theme.dark': 'داكن',
   'shell.hideSidebar': 'إخفاء الشريط الجانبي',

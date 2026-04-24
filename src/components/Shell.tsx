@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
-  Type, Image as ImageIcon, Video, Sun, Moon, Terminal,
+  Type, Image as ImageIcon, Video, Coffee, Terminal,
   PanelLeftClose, PanelLeftOpen, Settings as SettingsIcon,
   type LucideIcon,
 } from 'lucide-react'
@@ -27,7 +27,10 @@ const MODES: { id: Mode; labelKey: string; icon: LucideIcon }[] = [
 
 export default function Shell({ mode, onMode, children }: Props) {
   const t = useT()
-  const [themeRaw, setTheme] = usePersisted<ThemeId>('shell.theme', 'default-dark')
+  // Shell only READS the persisted theme and mirrors it to <html data-theme>.
+  // Changing the theme happens in the SettingsPanel; usePersisted keeps both
+  // instances in sync via its pub/sub.
+  const [themeRaw] = usePersisted<ThemeId>('shell.theme', 'default-dark')
   const theme: ThemeId = normalizeTheme(themeRaw)
   const [navOpen, setNavOpen] = usePersisted<boolean>('shell.navOpen', true)
   const [settingsOpen, setSettingsOpen] = useState(false)
@@ -69,17 +72,17 @@ export default function Shell({ mode, onMode, children }: Props) {
         <div className="flex items-center gap-3 text-[var(--mid)]">
           <span className="glow">{time}</span>
           <LanguageSwitcher />
-          <button
+          <a
             className="pixel-btn !px-2 !py-1"
-            onClick={() => setTheme(theme === 'default-light' ? 'default-dark' : 'default-light')}
-            aria-label={t('shell.toggleTheme')}
-            title={t('shell.toggleTheme')}
+            href="https://buymeacoffee.com/emireln"
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={t('shell.support')}
+            title={t('shell.support')}
           >
-            {theme === 'default-light' ? <Moon size={14} /> : <Sun size={14} />}
-            <span className="text-sm">
-              {theme === 'default-light' ? t('shell.theme.dark') : t('shell.theme.light')}
-            </span>
-          </button>
+            <Coffee size={14} />
+            <span className="text-sm uppercase">{t('shell.support')}</span>
+          </a>
           <button
             className="pixel-btn !px-2 !py-1"
             onClick={() => setSettingsOpen(true)}

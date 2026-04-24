@@ -25,6 +25,7 @@
 [![react](https://img.shields.io/badge/react-18-111?style=for-the-badge&labelColor=000&logo=react&logoColor=fff)](https://react.dev/)
 [![vite](https://img.shields.io/badge/vite-5-111?style=for-the-badge&labelColor=000&logo=vite&logoColor=fff)](https://vitejs.dev/)
 [![typescript](https://img.shields.io/badge/typescript-5-111?style=for-the-badge&labelColor=000&logo=typescript&logoColor=fff)](https://www.typescriptlang.org/)
+[![buy me a coffee](https://img.shields.io/badge/buy_me_a_coffee-support-FFDD00?style=for-the-badge&labelColor=000&logo=buymeacoffee&logoColor=000)](https://buymeacoffee.com/emireln)
 
 <sub>A retro CRT-terminal app that turns anything into ASCII.  Runs in a browser, on your desktop, or without internet.</sub>
 
@@ -199,6 +200,16 @@ esc           close the settings panel / dropdowns
 Pull requests welcome. If you add a new string, drop it into `src/i18n/dict.ts` under `en` — the rest fall back to English automatically until translated.
 
 For big changes, open an issue first so we can align on scope.
+
+---
+
+## `> support`
+
+miascii is fully free, fully offline, fully open source. If it saved you time or just made you smile, you can throw a coffee my way — it keeps the CRT warm.
+
+<a href="https://buymeacoffee.com/emireln" target="_blank"><img src="https://img.shields.io/badge/buy_me_a_coffee-@emireln-FFDD00?style=for-the-badge&labelColor=000&logo=buymeacoffee&logoColor=000" alt="buy me a coffee" /></a>
+
+No pressure — a star on this repo is also very appreciated.
 
 ---
 
