@@ -78,7 +78,10 @@
 English · Español · Português (BR) · Français · Deutsch · Italiano · Nederlands · Русский · 日本語 · 한국어 · 中文 · العربية (RTL)
 
 ### ◼ desktop app
-Native-feeling installers for **Windows · macOS · Linux** via Electron + electron-builder
+Native-feeling installers via Electron + electron-builder.
+- **Windows** — shipping today (NSIS installer + portable `.exe`)
+- **macOS** *(coming soon — needs a macOS CI runner to produce signed `.dmg` builds)*
+- **Linux** *(coming soon — AppImage / `.deb` will land once CI is wired up)*
 - Custom branded installer graphics + multi-resolution icons (16 → 1024)
 - **System tray** with context menu
 - **Close-to-tray** behaviour (toggleable)
@@ -104,12 +107,12 @@ npm run electron:dev   # opens a native window, hot-reload
 
 ### Desktop (build your own installer)
 ```bash
-npm run electron:build:win     # → release/miascii-x.y.z-setup-x64.exe
-npm run electron:build:linux   # → release/*.AppImage + *.deb
-npm run electron:build:mac     # macOS only, requires Xcode tools
+npm run electron:build:win     # → release/miascii-x.y.z-setup-x64.exe  (shipping today)
+npm run electron:build:linux   # → release/*.AppImage + *.deb          (coming soon)
+npm run electron:build:mac     # macOS only, requires Xcode tools      (coming soon)
 ```
 
-> **Want a ready binary?** Grab one from the [**Releases**](https://github.com/emireln/miascii/releases) page.
+> **Want a ready binary?** The **Windows** installer + portable `.exe` are on the [**Releases**](https://github.com/emireln/miascii/releases) page today. **macOS** and **Linux** prebuilt binaries are coming soon — they need a cross-platform CI pipeline (GitHub Actions matrix on `windows-latest` / `macos-latest` / `ubuntu-latest`) which will be wired up in a follow-up release.
 
 ---
 

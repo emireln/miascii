@@ -28,3 +28,7 @@ yarn-error.log*
 # Electron build cache
 out/
 .cache/
+
+# Marketing + docs website (kept out of this repo by user request)
+website-donotpushgithub/
+
