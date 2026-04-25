@@ -10,6 +10,19 @@ export type ElectronSettings = {
   minimizeToTray: boolean
 }
 
+export type UpdateInfo = {
+  version: string
+  releaseDate?: string
+  releaseNotes?: string
+}
+
+export type UpdateProgress = {
+  percent: number
+  bytesPerSecond: number
+  transferred: number
+  total: number
+}
+
 type MiasciiBridge = {
   isDesktop: true
   platform: NodeJS.Platform
@@ -25,6 +38,16 @@ type MiasciiBridge = {
     show: () => Promise<void>
     version: () => Promise<string>
     openExternal: (url: string) => Promise<void>
+  }
+  updater: {
+    check: () => Promise<{ success?: boolean; error?: string }>
+    download: () => Promise<{ success?: boolean; error?: string }>
+    install: () => Promise<{ success?: boolean; error?: string }>
+    onAvailable: (handler: (info: UpdateInfo) => void) => () => void
+    onNotAvailable: (handler: () => void) => () => void
+    onDownloaded: (handler: (info: UpdateInfo) => void) => () => void
+    onError: (handler: (error: { error: string }) => void) => () => void
+    onProgress: (handler: (progress: UpdateProgress) => void) => () => void
   }
 }
 

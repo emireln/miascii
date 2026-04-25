@@ -1,6 +1,10 @@
 appId: com.miascii.app
 productName: miascii
 copyright: Copyright © 2026 miascii
+publish:
+  provider: github
+  owner: emireln
+  repo: miascii
 directories:
   output: release
   buildResources: build

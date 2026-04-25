@@ -10,6 +10,7 @@ import { normalizeTheme, THEMES, type ThemeId } from '../lib/themes'
 import { useT } from '../i18n'
 import LanguageSwitcher from './LanguageSwitcher'
 import SettingsPanel from './SettingsPanel'
+import { UpdateBanner } from './UpdateBanner'
 
 export type Mode = 'text' | 'image' | 'video'
 
@@ -54,6 +55,7 @@ export default function Shell({ mode, onMode, children }: Props) {
 
   return (
     <div className="crt h-full w-full flex flex-col">
+      <UpdateBanner />
       {/* Top bar */}
       <header className="flex items-center justify-between px-4 py-2 border-b-2 border-[var(--fg)]">
         <div className="flex items-center gap-3">

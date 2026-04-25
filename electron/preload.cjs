@@ -27,4 +27,36 @@ contextBridge.exposeInMainWorld('miascii', {
     version: () => ipcRenderer.invoke('app:version'),
     openExternal: (url) => ipcRenderer.invoke('app:open-external', url),
   },
+
+  // Auto-updater bridge
+  updater: {
+    check: () => ipcRenderer.invoke('updater:check'),
+    download: () => ipcRenderer.invoke('updater:download'),
+    install: () => ipcRenderer.invoke('updater:install'),
+    onAvailable: (handler) => {
+      const listener = (_e, info) => handler(info)
+      ipcRenderer.on('updater:available', listener)
+      return () => ipcRenderer.removeListener('updater:available', listener)
+    },
+    onNotAvailable: (handler) => {
+      const listener = () => handler()
+      ipcRenderer.on('updater:not-available', listener)
+      return () => ipcRenderer.removeListener('updater:not-available', listener)
+    },
+    onDownloaded: (handler) => {
+      const listener = (_e, info) => handler(info)
+      ipcRenderer.on('updater:downloaded', listener)
+      return () => ipcRenderer.removeListener('updater:downloaded', listener)
+    },
+    onError: (handler) => {
+      const listener = (_e, error) => handler(error)
+      ipcRenderer.on('updater:error', listener)
+      return () => ipcRenderer.removeListener('updater:error', listener)
+    },
+    onProgress: (handler) => {
+      const listener = (_e, progress) => handler(progress)
+      ipcRenderer.on('updater:progress', listener)
+      return () => ipcRenderer.removeListener('updater:progress', listener)
+    },
+  },
 })

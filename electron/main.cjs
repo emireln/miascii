@@ -2,11 +2,22 @@
 const {
   app, BrowserWindow, shell, Menu, session, Tray, nativeImage, ipcMain,
 } = require('electron')
+const { autoUpdater } = require('electron-updater')
 const path = require('node:path')
 const fs = require('node:fs')
 
 const isDev = !app.isPackaged
 const VITE_DEV_SERVER_URL = process.env.VITE_DEV_SERVER_URL || 'http://localhost:5173'
+
+// --- Auto-updater configuration -----------------------------------------------
+autoUpdater.setFeedURL({
+  provider: 'github',
+  owner: 'emireln',
+  repo: 'miascii',
+})
+
+autoUpdater.autoDownload = false // Let user click to install
+autoUpdater.autoInstallOnAppQuit = false
 
 // Assets live in two places:
 //  - build/          used only at package time by electron-builder (installer
@@ -259,6 +270,83 @@ ipcMain.handle('app:open-external', (_e, url) => {
   if (typeof url === 'string') shell.openExternal(url)
 })
 ipcMain.handle('app:version', () => app.getVersion())
+
+// --- Auto-updater IPC handlers -----------------------------------------------
+ipcMain.handle('updater:check', async () => {
+  if (isDev) {
+    return { error: 'Updates are disabled in development' }
+  }
+  try {
+    await autoUpdater.checkForUpdates()
+    return { success: true }
+  } catch (error) {
+    return { error: error.message }
+  }
+})
+
+ipcMain.handle('updater:download', async () => {
+  if (isDev) {
+    return { error: 'Updates are disabled in development' }
+  }
+  try {
+    await autoUpdater.downloadUpdate()
+    return { success: true }
+  } catch (error) {
+    return { error: error.message }
+  }
+})
+
+ipcMain.handle('updater:install', () => {
+  if (isDev) {
+    return { error: 'Updates are disabled in development' }
+  }
+  autoUpdater.quitAndInstall()
+  return { success: true }
+})
+
+// --- Auto-updater event handlers ---------------------------------------------
+autoUpdater.on('update-available', (info) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('updater:available', {
+      version: info.version,
+      releaseDate: info.releaseDate,
+      releaseNotes: info.releaseNotes,
+    })
+  }
+})
+
+autoUpdater.on('update-not-available', () => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('updater:not-available')
+  }
+})
+
+autoUpdater.on('update-downloaded', (info) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('updater:downloaded', {
+      version: info.version,
+      releaseDate: info.releaseDate,
+      releaseNotes: info.releaseNotes,
+    })
+  }
+})
+
+autoUpdater.on('error', (error) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('updater:error', { error: error.message })
+  }
+})
+
+autoUpdater.on('download-progress', (progress) => {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send('updater:progress', {
+      percent: Math.floor(progress.percent),
+      bytesPerSecond: Math.floor(progress.bytesPerSecond),
+      transferred: Math.floor(progress.transferred),
+      total: Math.floor(progress.total),
+    })
+  }
+})
 
 // --- Boot --------------------------------------------------------------------
 if (!isDev) Menu.setApplicationMenu(null)
