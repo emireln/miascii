@@ -156,6 +156,7 @@ miascii/
 | command | what it does |
 |---|---|
 | `npm run dev` | Vite dev server on `:5173` |
+| `npm run dev:portless` | Portless dev server at `http://miascii.localhost` |
 | `npm run build` | Typecheck + production bundle into `dist/` |
 | `npm run preview` | Serve `dist/` locally |
 | `npm run icons` | Regenerate every icon + installer graphic from SVG + banner |

@@ -1,0 +1,6 @@
+# miascii Cursor Rules
+
+Follow the repository rules defined in AGENTS.md:
+- **Caveman mode**: Keep responses terse, direct, and token-efficient.
+- **Ponytail mode**: Follow the YAGNI decision ladder. Reuse existing code and native browser APIs.
+- **Theme/Design**: Maintain the CRT retro pixel design tokens (--fg, --bg, --panel, pixel-panel, pixel-btn).

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import {
-  Type, Image as ImageIcon, Video, Coffee, Terminal,
+  Type, Image as ImageIcon, Video, Coffee,
   PanelLeftClose, PanelLeftOpen, Settings as SettingsIcon,
   type LucideIcon,
 } from 'lucide-react'
@@ -67,9 +67,7 @@ export default function Shell({ mode, onMode, children }: Props) {
           >
             {navOpen ? <PanelLeftClose size={14} /> : <PanelLeftOpen size={14} />}
           </button>
-          <Terminal size={18} />
           <span className="font-pixel text-[11px] tracking-widest uppercase">miascii</span>
-          <span className="text-[var(--dim)] text-base">v2.1</span>
         </div>
         <div className="flex items-center gap-3 text-[var(--mid)]">
           <span className="glow">{time}</span>
@@ -119,11 +117,6 @@ export default function Shell({ mode, onMode, children }: Props) {
               )
             })}
 
-            <div className="mt-auto text-[var(--dim)] text-sm px-1 pt-3 divider">
-              <div>{t('shell.footer.clientOnly')}</div>
-              <div>{t('shell.footer.noUpload')}</div>
-              <div className="mt-2 caret inline-block">{t('shell.footer.ready')}</div>
-            </div>
           </nav>
         )}
 

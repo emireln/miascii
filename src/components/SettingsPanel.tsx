@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { X, ExternalLink, BookOpen, Download, Upload, FolderOpen, Power, RotateCcw, Check } from 'lucide-react'
+import { X, Download, Upload, FolderOpen, Power, RotateCcw, Check } from 'lucide-react'
 import { useT } from '../i18n'
 import { usePersisted, clearPersisted } from '../lib/usePersisted'
 import { bridge, isElectron, type ElectronSettings } from '../lib/electronBridge'
@@ -275,54 +275,9 @@ export default function SettingsPanel({ open, onClose }: Props) {
               <RotateCcw size={14} />
               {t('settings.resetAll')}
             </button>
-          </div>
-          <input
-            ref={importRef}
-            type="file"
-            accept="application/json,.json"
-            className="hidden"
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) importFile(f) }}
-          />
-        </section>
-
-        <div className="divider" />
-
-        {/* About */}
-        <section className="space-y-2">
-          <Label>{`> ${t('settings.section.about')}`}</Label>
-          <div className="text-[var(--dim)] text-sm space-y-1">
-            <div>
-              <span className="text-[var(--fg)] font-pixel uppercase text-[11px] tracking-widest">miascii</span>
-              <span className="ml-2">{t('settings.about.version')} {version}</span>
-            </div>
-            <div>{t('settings.about.tagline')}</div>
-          </div>
-          <div className="flex gap-2 flex-wrap">
-            <button
-              className="pixel-btn justify-start"
-              onClick={() => {
-                const url = 'https://www.miascii.site/'
-                if (electron) bridge()?.app.openExternal(url)
-                else window.open(url, '_blank', 'noopener')
-              }}
-            >
-              <ExternalLink size={14} />
-              {t('settings.about.repo')}
-            </button>
-            <button
-              className="pixel-btn justify-start"
-              onClick={() => {
-                const url = 'https://www.miascii.site/docs'
-                if (electron) bridge()?.app.openExternal(url)
-                else window.open(url, '_blank', 'noopener')
-              }}
-            >
-              <BookOpen size={14} />
-              {t('settings.about.docs')}
-            </button>
             {electron && (
               <button
-                className="pixel-btn justify-start"
+                className="pixel-btn justify-start sm:col-span-2"
                 onClick={() => bridge()?.app.quit()}
                 style={{ color: '#ff6b6b' }}
               >
@@ -331,6 +286,13 @@ export default function SettingsPanel({ open, onClose }: Props) {
               </button>
             )}
           </div>
+          <input
+            ref={importRef}
+            type="file"
+            accept="application/json,.json"
+            className="hidden"
+            onChange={(e) => { const f = e.target.files?.[0]; if (f) importFile(f) }}
+          />
         </section>
       </div>
     </div>

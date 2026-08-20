@@ -457,6 +457,12 @@ export default function VideoAscii() {
             options={COLOR_MODES}
             searchable={false}
           />
+          {color === 'duotone' && (
+            <div className="mt-2 grid grid-cols-2 gap-2">
+              <ColorField label={t('image.color.shadow')} value={duoA} onChange={setDuoA} pickLabel={t('image.color.pick')} />
+              <ColorField label={t('image.color.highlight')} value={duoB} onChange={setDuoB} pickLabel={t('image.color.pick')} />
+            </div>
+          )}
         </div>
 
         <div className="flex gap-2">
@@ -591,3 +597,45 @@ export default function VideoAscii() {
     </div>
   )
 }
+
+function ColorField({
+  label, value, onChange, pickLabel = 'pick',
+}: { label: string; value: string; onChange: (v: string) => void; pickLabel?: string }) {
+  return (
+    <div>
+      <div className="text-[var(--dim)] text-sm uppercase mb-1">{label}</div>
+      <div
+        className="pixel-panel !shadow-none flex items-center gap-2 px-2 py-1.5"
+        style={{ background: 'var(--panel)' }}
+      >
+        <div
+          className="w-5 h-5"
+          style={{ background: value, border: '2px solid var(--fg)' }}
+        />
+        <input
+          type="color"
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="w-0 h-0 opacity-0 absolute pointer-events-none"
+          tabIndex={-1}
+        />
+        <input
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          className="flex-1 bg-transparent outline-none font-mono text-base"
+          spellCheck={false}
+        />
+        <label className="pixel-btn !py-0.5 !px-2 !text-xs cursor-pointer">
+          {pickLabel}
+          <input
+            type="color"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            className="hidden"
+          />
+        </label>
+      </div>
+    </div>
+  )
+}
+
