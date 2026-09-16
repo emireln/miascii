@@ -33,6 +33,10 @@
 
 ---
 
+This application was developed while I was studying Tsx, with the help of AI (Cursor, Composer 2.0).
+
+---
+
 ## `> whoami`
 
 **miascii** (pronounced _my-ascii_) is a chunky-pixel, retro-terminal studio that converts:
