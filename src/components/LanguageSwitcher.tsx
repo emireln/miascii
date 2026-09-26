@@ -43,7 +43,7 @@ export default function LanguageSwitcher() {
                 key={l.id}
                 className={cn(
                   'w-full flex items-center justify-between gap-2 px-3 py-1.5 text-left text-sm',
-                  'hover:bg-[var(--fg)] hover:text-[var(--bg)]',
+                  'hover:bg-[var(--accent-soft)] hover:text-[var(--accent)]',
                 )}
                 onClick={() => { setLocale(l.id); setOpen(false) }}
               >

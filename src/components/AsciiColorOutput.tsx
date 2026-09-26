@@ -17,7 +17,7 @@ type Props = {
  * Keeps the same pixel-panel styling as AsciiOutput.
  */
 const AsciiColorOutput = forwardRef<HTMLPreElement, Props>(function AsciiColorOutput(
-  { text, colors, cols, rows, fontSize = 12, className, empty = '// drop an image to begin' },
+  { text, colors, cols, rows, fontSize = 12, className, empty = 'Your image preview will appear here.' },
   ref,
 ) {
   const hasColor = !!colors && colors.length === cols * rows

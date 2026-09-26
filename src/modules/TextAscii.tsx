@@ -138,9 +138,9 @@ export default function TextAscii() {
   }
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-4">
+    <div className="tool-layout grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-4">
       {/* Controls */}
-      <aside className="pixel-panel p-4 space-y-5 h-fit">
+      <aside className="tool-controls pixel-panel p-4 space-y-5 h-fit">
         <div>
           <Label>{t('text.input.label')}</Label>
           <div className="pixel-panel !shadow-none p-2">
@@ -240,9 +240,9 @@ export default function TextAscii() {
       </aside>
 
       {/* Output — sticks in place while sidebar scrolls */}
-      <section className="min-w-0 space-y-2 lg:sticky lg:top-0 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:flex lg:flex-col">
+      <section className="tool-preview min-w-0 space-y-2 lg:sticky lg:top-0 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:flex lg:flex-col">
         <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div className="font-pixel text-[10px] uppercase text-[var(--mid)]">
+          <div className="text-xs font-semibold tracking-wide text-[var(--mid)]">
             {t('text.output.title')}
           </div>
           <div className="flex items-center gap-2">

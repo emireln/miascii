@@ -9,7 +9,7 @@ type Props = {
 }
 
 const AsciiOutput = forwardRef<HTMLPreElement, Props>(function AsciiOutput(
-  { text, empty = '// output will appear here', className, fontSize = 14 },
+  { text, empty = 'Your text preview will appear here.', className, fontSize = 14 },
   ref,
 ) {
   return (

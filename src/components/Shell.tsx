@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react'
 import {
-  Type, Image as ImageIcon, Video, Coffee,
-  PanelLeftClose, PanelLeftOpen, Settings as SettingsIcon,
-  type LucideIcon,
+  Type, Image as ImageIcon, Video, Coffee, PanelLeftClose, PanelLeftOpen, Menu,
+  Settings as SettingsIcon, Sun, Moon, ShieldCheck, type LucideIcon,
 } from 'lucide-react'
 import { cn } from '../lib/cn'
 import { usePersisted } from '../lib/usePersisted'
@@ -28,104 +27,153 @@ const MODES: { id: Mode; labelKey: string; icon: LucideIcon }[] = [
 
 export default function Shell({ mode, onMode, children }: Props) {
   const t = useT()
-  // Shell only READS the persisted theme and mirrors it to <html data-theme>.
-  // Changing the theme happens in the SettingsPanel; usePersisted keeps both
-  // instances in sync via its pub/sub.
-  const [themeRaw] = usePersisted<ThemeId>('shell.theme', 'default-dark')
-  const theme: ThemeId = normalizeTheme(themeRaw)
+  const [themeRaw, setThemeRaw] = usePersisted<ThemeId>('shell.theme', 'default-light')
+  const theme = normalizeTheme(themeRaw)
   const [navOpen, setNavOpen] = usePersisted<boolean>('shell.navOpen', true)
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 700px)').matches)
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const currentMode = MODES.find((item) => item.id === mode) ?? MODES[0]
+
+  useEffect(() => {
+    const media = window.matchMedia('(max-width: 700px)')
+    const sync = () => {
+      setIsMobile(media.matches)
+      if (!media.matches) setMobileNavOpen(false)
+    }
+    sync()
+    media.addEventListener('change', sync)
+    return () => media.removeEventListener('change', sync)
+  }, [])
 
   useEffect(() => {
     const root = document.documentElement
     root.dataset.theme = theme
-    // Legacy .light class kept in sync for any older selectors still using it
-    const def = THEMES.find((t) => t.id === theme)
-    if (def?.mode === 'light') root.classList.add('light')
+    const definition = THEMES.find((item) => item.id === theme)
+    if (definition?.mode === 'light') root.classList.add('light')
     else root.classList.remove('light')
   }, [theme])
 
-  const [clock, setClock] = useState(() => new Date())
-  useEffect(() => {
-    const id = setInterval(() => setClock(new Date()), 1000)
-    return () => clearInterval(id)
-  }, [])
-
-  const time = clock.toTimeString().slice(0, 8)
+  const chooseMode = (nextMode: Mode) => {
+    onMode(nextMode)
+    setMobileNavOpen(false)
+  }
 
   return (
-    <div className="crt h-full w-full flex flex-col">
+    <div className="app-shell">
       <UpdateBanner />
-      {/* Top bar */}
-      <header className="flex items-center justify-between px-4 py-2 border-b-2 border-[var(--fg)]">
-        <div className="flex items-center gap-3">
+      <div className="app-frame">
+        {mobileNavOpen && (
           <button
-            className="pixel-btn !px-2 !py-1"
-            onClick={() => setNavOpen((o) => !o)}
-            aria-label={navOpen ? t('shell.hideSidebar') : t('shell.showSidebar')}
-            title={navOpen ? t('shell.hideSidebar') : t('shell.showSidebar')}
-          >
-            {navOpen ? <PanelLeftClose size={14} /> : <PanelLeftOpen size={14} />}
-          </button>
-          <span className="font-pixel text-[11px] tracking-widest uppercase">miascii</span>
-        </div>
-        <div className="flex items-center gap-3 text-[var(--mid)]">
-          <span className="glow">{time}</span>
-          <LanguageSwitcher />
-          <a
-            className="pixel-btn !px-2 !py-1"
-            href="https://buymeacoffee.com/emireln"
-            target="_blank"
-            rel="noopener noreferrer"
-            aria-label={t('shell.support')}
-            title={t('shell.support')}
-          >
-            <Coffee size={14} />
-            <span className="text-sm uppercase">{t('shell.support')}</span>
-          </a>
-          <button
-            className="pixel-btn !px-2 !py-1"
-            onClick={() => setSettingsOpen(true)}
-            aria-label={t('settings.open')}
-            title={t('settings.open')}
-          >
-            <SettingsIcon size={14} />
-          </button>
-        </div>
-      </header>
-
-      <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
-
-      <div className="flex flex-1 min-h-0">
-        {/* Sidebar */}
-        {navOpen && (
-          <nav className="w-56 shrink-0 border-r-2 border-[var(--fg)] p-3 flex flex-col gap-2">
-            <div className="text-[var(--dim)] uppercase text-sm px-1 pb-1">{t('shell.modes')}</div>
-            {MODES.map((m) => {
-              const Icon = m.icon
-              const active = mode === m.id
-              return (
-                <button
-                  key={m.id}
-                  data-active={active}
-                  onClick={() => onMode(m.id)}
-                  className={cn('pixel-btn w-full justify-start')}
-                >
-                  <Icon size={14} />
-                  <span>{t(m.labelKey)}</span>
-                </button>
-              )
-            })}
-
-          </nav>
+            className="sidebar-scrim"
+            type="button"
+            aria-label={t('common.close')}
+            onClick={() => setMobileNavOpen(false)}
+          />
         )}
 
-        {/* Main */}
-        <main className="flex-1 min-w-0 min-h-0 overflow-auto p-4 glow">{children}</main>
+        <aside className={cn('app-sidebar', !navOpen && 'is-collapsed', mobileNavOpen && 'mobile-open')}>
+          <div className="sidebar-brand">
+            <div className="brand-mark" aria-hidden="true">m</div>
+            <div className="brand-copy">
+              <strong>miascii</strong>
+            </div>
+          </div>
+
+          <div className="sidebar-section-label">{t('shell.modes')}</div>
+          <nav className="mode-nav" aria-label={t('shell.modes')}>
+            {MODES.map(({ id, labelKey, icon: Icon }) => (
+              <button
+                key={id}
+                className={cn('nav-item', mode === id && 'active')}
+                type="button"
+                title={t(labelKey)}
+                aria-current={mode === id ? 'page' : undefined}
+                onClick={() => chooseMode(id)}
+              >
+                <Icon size={19} aria-hidden="true" />
+                <span className="nav-label">{t(labelKey)}</span>
+              </button>
+            ))}
+          </nav>
+
+          <div className="sidebar-bottom">
+            <div className="privacy-note">
+              <ShieldCheck size={17} aria-hidden="true" />
+              <span>{t('shell.footer.noUpload')}</span>
+            </div>
+            <a
+              className="support-link"
+              href="https://buymeacoffee.com/emireln"
+              target="_blank"
+              rel="noopener noreferrer"
+              title={t('shell.support')}
+            >
+              <Coffee size={18} aria-hidden="true" />
+              <span className="support-label">{t('shell.support')}</span>
+            </a>
+          </div>
+        </aside>
+
+        <div className="app-main">
+          <header className="app-topbar">
+            <div className="topbar-leading">
+              <button
+                className="icon-button topbar-mobile-menu"
+                type="button"
+                aria-label={isMobile
+                  ? t(mobileNavOpen ? 'shell.hideSidebar' : 'shell.showSidebar')
+                  : t(navOpen ? 'shell.hideSidebar' : 'shell.showSidebar')}
+                onClick={() => {
+                  if (isMobile) setMobileNavOpen((open) => !open)
+                  else setNavOpen((open) => !open)
+                }}
+              >
+                <span className="desktop-only">
+                  {navOpen ? <PanelLeftClose size={19} /> : <PanelLeftOpen size={19} />}
+                </span>
+                <Menu className="mobile-only" size={20} />
+              </button>
+              <span>{t(currentMode.labelKey)}</span>
+            </div>
+            <div className="topbar-actions">
+              <button
+                className="icon-button"
+                type="button"
+                onClick={() => setThemeRaw(theme === 'default-light' ? 'default-dark' : 'default-light')}
+                aria-label={t('shell.toggleTheme')}
+                title={t('shell.toggleTheme')}
+              >
+                {theme === 'default-light' ? <Moon size={18} /> : <Sun size={18} />}
+              </button>
+              <LanguageSwitcher />
+              <button
+                className="icon-button"
+                type="button"
+                onClick={() => setSettingsOpen(true)}
+                aria-label={t('settings.open')}
+                title={t('settings.open')}
+              >
+                <SettingsIcon size={18} />
+              </button>
+            </div>
+          </header>
+
+          <main className="app-content">
+            <div className="content-wrap">
+              <div className="page-heading">
+                <div>
+                  <p>{t('shell.modes')}</p>
+                  <h1>{t(currentMode.labelKey)}</h1>
+                </div>
+              </div>
+              {children}
+            </div>
+          </main>
+        </div>
       </div>
 
-      {/* CRT overlays */}
-      <div className="crt-curve" />
+      <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </div>
   )
 }

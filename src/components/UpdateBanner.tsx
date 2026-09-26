@@ -104,7 +104,7 @@ export function UpdateBanner() {
 
   return (
     <div
-      className="pixel-panel !shadow-none border-b-2 border-[var(--fg)] px-4 py-2 z-50"
+      className="border-b border-[var(--border)] px-5 py-3 z-50"
       style={{ background: 'var(--panel)', color: 'var(--fg)' }}
     >
       <div className="flex items-center justify-between gap-4">
@@ -125,25 +125,25 @@ export function UpdateBanner() {
           <div className="flex-1 min-w-0 text-base">
             {state === 'available' && updateInfo && (
               <span>
-                <span className="font-pixel text-[10px] uppercase tracking-wider mr-2">[update]</span>
+                <span className="font-semibold mr-2">Update available</span>
                 miascii {updateInfo.version} available
               </span>
             )}
             {state === 'downloading' && progress && (
               <span>
-                <span className="font-pixel text-[10px] uppercase tracking-wider mr-2">[downloading]</span>
+                <span className="font-semibold mr-2">Downloading update</span>
                 {progress.percent}%
               </span>
             )}
             {state === 'downloaded' && updateInfo && (
               <span>
-                <span className="font-pixel text-[10px] uppercase tracking-wider mr-2">[ready]</span>
+                <span className="font-semibold mr-2">Update ready</span>
                 miascii {updateInfo.version} — restart to install
               </span>
             )}
             {state === 'error' && (
               <span className="text-red-400">
-                <span className="font-pixel text-[10px] uppercase tracking-wider mr-2">[error]</span>
+                <span className="font-semibold mr-2">Update failed</span>
                 {error}
               </span>
             )}

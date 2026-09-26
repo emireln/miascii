@@ -79,7 +79,7 @@ export default function PixelSelect({
     <div ref={rootRef} className="relative" onKeyDown={onKey}>
       <button
         type="button"
-        className="pixel-btn w-full justify-between"
+        className="pixel-btn pixel-select-trigger w-full justify-between"
         data-active={open}
         onClick={() => setOpen((o) => !o)}
       >
@@ -95,7 +95,7 @@ export default function PixelSelect({
 
       {open && (
         <div
-          className="absolute left-0 right-0 top-[calc(100%+6px)] z-50 pixel-panel"
+          className="pixel-select-menu absolute left-0 right-0 top-[calc(100%+6px)] z-50 pixel-panel"
           style={{ background: 'var(--bg)' }}
         >
           {searchable && (
@@ -120,7 +120,7 @@ export default function PixelSelect({
             style={{ background: 'var(--bg)' }}
           >
             {filtered.length === 0 && (
-              <div className="px-3 py-2 text-[var(--dim)] text-sm">// no matches</div>
+                <div className="px-3 py-2 text-[var(--dim)] text-sm">No matches</div>
             )}
             {filtered.map((o, i) => {
               const selected = o === value
@@ -136,12 +136,11 @@ export default function PixelSelect({
                     'w-full text-left px-3 py-1 font-mono text-lg flex items-center justify-between gap-2 cursor-pointer',
                   )}
                   style={{
-                    background: active ? 'var(--fg)' : 'transparent',
-                    color: active ? 'var(--bg)' : 'var(--fg)',
+                    background: active ? 'var(--accent-soft)' : 'transparent',
+                    color: active ? 'var(--accent)' : 'var(--fg)',
                   }}
                 >
                   <span className="truncate">
-                    <span style={{ opacity: 0.5 }}>{active ? '>' : ' '} </span>
                     {display(o)}
                   </span>
                   {selected && <Check size={12} />}
@@ -153,7 +152,7 @@ export default function PixelSelect({
             className="px-2 py-1 text-[var(--dim)] text-sm flex justify-between"
             style={{ borderTop: '2px solid var(--fg)' }}
           >
-            <span>↑↓ navigate · ↵ pick · esc</span>
+            <span>Use ↑ ↓, Enter, or Esc</span>
             <span>{filtered.length}/{options.length}</span>
           </div>
         </div>

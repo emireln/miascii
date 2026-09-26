@@ -310,15 +310,13 @@ export default function VideoAscii() {
     if (source === 'file') parts.push(fileName || 'video')
     else if (source === 'webcam') parts.push(t('video.webcam.live'))
     else parts.push(t('video.status.noSource'))
-    if (playing) parts.push('▶')
-    else parts.push('⏸')
     if (source !== 'none') parts.push(`${actualFps}/${fps} fps`)
     return parts.join('  ·  ')
   }, [source, fileName, playing, actualFps, fps, t])
 
   return (
-    <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-4">
-      <aside className="pixel-panel p-4 space-y-5 h-fit">
+    <div className="tool-layout grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-4">
+      <aside className="tool-controls pixel-panel p-4 space-y-5 h-fit">
         <div>
           <Label>{t('video.source.label')}</Label>
           {source === 'none' && (
@@ -507,9 +505,9 @@ export default function VideoAscii() {
         </div>
       </aside>
 
-      <section className="min-w-0 space-y-2 lg:sticky lg:top-0 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:flex lg:flex-col">
+      <section className="tool-preview min-w-0 space-y-2 lg:sticky lg:top-0 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:flex lg:flex-col">
         <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div className="font-pixel text-[10px] uppercase text-[var(--mid)]">
+          <div className="text-xs font-semibold tracking-wide text-[var(--mid)]">
             {t('video.output.title')} &nbsp;&nbsp; {statusLine}
             {recording && (
               <span className="ml-2 text-red-400">{t('video.recording', { seconds: recElapsed })}</span>
@@ -610,7 +608,7 @@ function ColorField({
       >
         <div
           className="w-5 h-5"
-          style={{ background: value, border: '2px solid var(--fg)' }}
+          style={{ background: value, border: '1px solid var(--border)', borderRadius: 6 }}
         />
         <input
           type="color"
@@ -638,4 +636,3 @@ function ColorField({
     </div>
   )
 }
-

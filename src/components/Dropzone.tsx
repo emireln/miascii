@@ -31,10 +31,17 @@ export default function Dropzone({ accept, onFile, label, hint }: Props) {
         pickFile(e.dataTransfer.files?.[0])
       }}
       className={cn(
-        'block pixel-panel p-4 text-center cursor-pointer select-none',
-        drag && 'bg-[var(--fg)] text-[var(--bg)]',
+        'dropzone block pixel-panel p-5 text-center cursor-pointer select-none',
       )}
-      style={drag ? { background: 'var(--fg)', color: 'var(--bg)' } : undefined}
+      data-drag={drag}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault()
+          inputRef.current?.click()
+        }
+      }}
     >
       <input
         ref={inputRef}
@@ -45,7 +52,7 @@ export default function Dropzone({ accept, onFile, label, hint }: Props) {
       />
       <div className="flex flex-col items-center gap-1">
         <Upload size={18} />
-        <div className="font-pixel text-[10px] uppercase">&gt; {effectiveLabel}</div>
+        <div className="font-semibold">{effectiveLabel}</div>
         <div className="text-[var(--dim)] text-sm">{effectiveHint}</div>
       </div>
     </label>

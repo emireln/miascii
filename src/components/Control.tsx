@@ -2,7 +2,7 @@ import { cn } from '../lib/cn'
 
 export function Label({ children, className }: { children: React.ReactNode; className?: string }) {
   return (
-    <div className={cn('font-pixel text-[10px] uppercase tracking-widest text-[var(--mid)] mb-2', className)}>
+    <div className={cn('text-xs font-semibold tracking-wide text-[var(--mid)] mb-2', className)}>
       {children}
     </div>
   )
@@ -75,12 +75,14 @@ export function Toggle({
 }) {
   return (
     <button
-      className="pixel-btn w-full justify-between"
+      type="button"
+      aria-pressed={value}
+      className="control-toggle"
       data-active={value}
       onClick={() => onChange(!value)}
     >
       <span>{label}</span>
-      <span>[{value ? 'x' : ' '}]</span>
+      <span className="switch-track" aria-hidden="true" />
     </button>
   )
 }

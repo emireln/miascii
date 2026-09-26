@@ -1,45 +1,29 @@
-// Theme catalog — each theme is applied by setting <html data-theme="id">.
-// All CSS tokens are switched via [data-theme] selectors in global.css.
-//
-// The two swatches (bg/fg) are used by SettingsPanel to render a visual chip.
-
-export type ThemeId =
-  | 'default-dark'
-  | 'default-light'
-  | 'phosphor'
-  | 'amber'
-  | 'synthwave'
-  | 'cyan'
-  | 'alert'
-  | 'paper'
+// Theme catalog — preferences are persisted by ID so the UI can evolve safely.
+export type ThemeId = 'default-dark' | 'default-light'
 
 export type ThemeDef = {
   id: ThemeId
-  nameKey: string   // i18n key in dict
-  bg: string        // for preview swatch
-  fg: string        // for preview swatch
+  nameKey: string
+  bg: string
+  fg: string
   mode: 'dark' | 'light'
 }
 
 export const THEMES: ThemeDef[] = [
-  { id: 'default-dark',  nameKey: 'theme.defaultDark',  bg: '#0a0a0a', fg: '#e6e6e6', mode: 'dark'  },
-  { id: 'default-light', nameKey: 'theme.defaultLight', bg: '#ffffff', fg: '#000000', mode: 'light' },
-  { id: 'phosphor',      nameKey: 'theme.phosphor',     bg: '#000000', fg: '#33ff66', mode: 'dark'  },
-  { id: 'amber',         nameKey: 'theme.amber',        bg: '#0b0600', fg: '#ffb000', mode: 'dark'  },
-  { id: 'synthwave',     nameKey: 'theme.synthwave',    bg: '#140425', fg: '#ff2d95', mode: 'dark'  },
-  { id: 'cyan',          nameKey: 'theme.cyan',         bg: '#000814', fg: '#00e6ff', mode: 'dark'  },
-  { id: 'alert',         nameKey: 'theme.alert',        bg: '#0a0000', fg: '#ff3b3b', mode: 'dark'  },
-  { id: 'paper',         nameKey: 'theme.paper',        bg: '#f3ead9', fg: '#2a1a05', mode: 'light' },
+  { id: 'default-light', nameKey: 'theme.defaultLight', bg: '#f5f6f8', fg: '#191b21', mode: 'light' },
+  { id: 'default-dark', nameKey: 'theme.defaultDark', bg: '#111216', fg: '#f2f3f6', mode: 'dark' },
 ]
 
 export function isThemeId(v: unknown): v is ThemeId {
-  return typeof v === 'string' && THEMES.some((t) => t.id === v)
+  return v === 'default-dark' || v === 'default-light'
 }
 
-/** Migrate legacy 'dark' / 'light' persisted values to the new catalog. */
+/** Migrate older palettes to the clean light/dark palette without losing preference. */
 export function normalizeTheme(v: unknown): ThemeId {
-  if (v === 'dark') return 'default-dark'
-  if (v === 'light') return 'default-light'
-  if (isThemeId(v)) return v
-  return 'default-dark'
+  if (v === 'dark' || v === 'default-dark') return 'default-dark'
+  if (v === 'light' || v === 'default-light' || v === 'paper') return 'default-light'
+  if (typeof v === 'string' && ['phosphor', 'amber', 'synthwave', 'cyan', 'alert'].includes(v)) {
+    return 'default-dark'
+  }
+  return 'default-light'
 }

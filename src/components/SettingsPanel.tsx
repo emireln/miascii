@@ -19,7 +19,7 @@ const DEFAULT_ELECTRON: ElectronSettings = {
 /**
  * SettingsPanel — modal dialog with 4 sections:
  *   window & tray  (electron-only; disabled on web)
- *   appearance     (CRT intensity, reduce motion, UI scale — CSS vars on <html>)
+ *   appearance     (theme, reduce motion, UI scale — CSS vars on <html>)
  *   data           (export / import / reset / quit)
  *   about          (version, tagline, external link)
  */
@@ -29,10 +29,9 @@ export default function SettingsPanel({ open, onClose }: Props) {
   const [version, setVersion] = useState<string>('0.1.0')
 
   // Renderer-only appearance prefs
-  const [crtIntensity, setCrtIntensity] = usePersisted<number>('ui.crtIntensity', 0)
   const [reduceMotion, setReduceMotion] = usePersisted<boolean>('ui.reduceMotion', false)
   const [uiScale, setUiScale] = usePersisted<number>('ui.scale', 100)
-  const [themeRaw, setTheme] = usePersisted<ThemeId>('shell.theme', 'default-dark')
+  const [themeRaw, setTheme] = usePersisted<ThemeId>('shell.theme', 'default-light')
   const activeTheme = normalizeTheme(themeRaw)
 
   const importRef = useRef<HTMLInputElement>(null)
@@ -52,11 +51,10 @@ export default function SettingsPanel({ open, onClose }: Props) {
   // Apply appearance CSS vars globally whenever they change
   useEffect(() => {
     const root = document.documentElement
-    root.style.setProperty('--crt-intensity', String(crtIntensity))
     root.style.fontSize = `${uiScale}%`
     if (reduceMotion) root.classList.add('reduce-motion')
     else root.classList.remove('reduce-motion')
-  }, [crtIntensity, reduceMotion, uiScale])
+  }, [reduceMotion, uiScale])
 
   // ESC closes
   useEffect(() => {
@@ -126,16 +124,19 @@ export default function SettingsPanel({ open, onClose }: Props) {
   return (
     <div
       className="fixed inset-0 z-[100] flex items-start justify-center p-4 sm:p-8 overflow-auto"
-      style={{ background: 'rgba(0,0,0,0.7)' }}
+      style={{ background: 'rgba(15,17,23,0.48)', backdropFilter: 'blur(6px)' }}
       onClick={onClose}
     >
       <div
         className="pixel-panel w-full max-w-[720px] p-5 my-8 space-y-5"
         style={{ background: 'var(--panel)' }}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="settings-title"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between">
-          <div className="font-pixel text-[11px] uppercase tracking-widest">
+          <div id="settings-title" className="text-lg font-semibold tracking-tight">
             {t('settings.title')}
           </div>
           <button className="pixel-btn !px-2 !py-1" onClick={onClose} aria-label={t('common.close')}>
@@ -146,7 +147,7 @@ export default function SettingsPanel({ open, onClose }: Props) {
         {/* Window & Tray */}
         <section className="space-y-3">
           <div className="flex items-baseline gap-2">
-            <Label>{`> ${t('settings.section.window')}`}</Label>
+            <Label>{t('settings.section.window')}</Label>
             {!electron && (
               <span className="text-[var(--dim)] text-sm">{t('settings.desktop.only')}</span>
             )}
@@ -187,11 +188,11 @@ export default function SettingsPanel({ open, onClose }: Props) {
 
         {/* Appearance */}
         <section className="space-y-3">
-          <Label>{`> ${t('settings.section.appearance')}`}</Label>
+          <Label>{t('settings.section.appearance')}</Label>
 
           <div>
             <Label>{t('settings.theme')}</Label>
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {THEMES.map((th) => {
                 const active = th.id === activeTheme
                 return (
@@ -211,10 +212,9 @@ export default function SettingsPanel({ open, onClose }: Props) {
                           width: 18,
                           height: 18,
                           flexShrink: 0,
-                          // diagonal split: bg in upper-left, fg in lower-right
-                          background: `linear-gradient(135deg, ${th.bg} 0 50%, ${th.fg} 50% 100%)`,
-                          outline: '1px solid currentColor',
-                          outlineOffset: 0,
+                          background: th.bg,
+                          border: `2px solid ${th.fg}`,
+                          borderRadius: '50%',
                         }}
                       />
                       <span className="truncate">{t(th.nameKey)}</span>
@@ -226,10 +226,6 @@ export default function SettingsPanel({ open, onClose }: Props) {
             </div>
           </div>
 
-          <div>
-            <Label>{`${t('settings.crtIntensity')} (${crtIntensity}%)`}</Label>
-            <Slider value={crtIntensity} onChange={setCrtIntensity} min={0} max={100} step={5} />
-          </div>
           <div>
             <Label>{`${t('settings.uiScale')} (${uiScale}%)`}</Label>
             <Slider value={uiScale} onChange={setUiScale} min={80} max={140} step={5} />
@@ -245,7 +241,7 @@ export default function SettingsPanel({ open, onClose }: Props) {
 
         {/* Data */}
         <section className="space-y-2">
-          <Label>{`> ${t('settings.section.data')}`}</Label>
+          <Label>{t('settings.section.data')}</Label>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <button className="pixel-btn justify-start" onClick={exportAll}>
               <Download size={14} />
