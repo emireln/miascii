@@ -1,6 +1,5 @@
 import { useRef, useState } from 'react'
 import { Upload } from 'lucide-react'
-import { cn } from '../lib/cn'
 import { useT } from '../i18n'
 
 type Props = {
@@ -10,51 +9,44 @@ type Props = {
   hint?: string
 }
 
+/** Click-or-drop file target. A real button, so keyboard and screen readers work. */
 export default function Dropzone({ accept, onFile, label, hint }: Props) {
   const t = useT()
-  const effectiveLabel = label ?? t('dropzone.dropImage')
-  const effectiveHint = hint ?? t('common.browse')
-  const [drag, setDrag] = useState(false)
   const inputRef = useRef<HTMLInputElement>(null)
+  const [drag, setDrag] = useState(false)
 
-  const pickFile = (f: File | null | undefined) => {
-    if (f) onFile(f)
+  const pick = (file: File | null | undefined) => {
+    if (file) onFile(file)
   }
 
   return (
-    <label
+    <button
+      type="button"
+      className="dropzone pixel-panel"
+      data-drag={drag}
+      onClick={() => inputRef.current?.click()}
+      onDragEnter={(e) => { e.preventDefault(); setDrag(true) }}
       onDragOver={(e) => { e.preventDefault(); setDrag(true) }}
-      onDragLeave={() => setDrag(false)}
+      onDragLeave={(e) => { if (!e.currentTarget.contains(e.relatedTarget as Node | null)) setDrag(false) }}
       onDrop={(e) => {
         e.preventDefault()
         setDrag(false)
-        pickFile(e.dataTransfer.files?.[0])
-      }}
-      className={cn(
-        'dropzone block pixel-panel p-5 text-center cursor-pointer select-none',
-      )}
-      data-drag={drag}
-      role="button"
-      tabIndex={0}
-      onKeyDown={(e) => {
-        if (e.key === 'Enter' || e.key === ' ') {
-          e.preventDefault()
-          inputRef.current?.click()
-        }
+        pick(e.dataTransfer.files?.[0])
       }}
     >
       <input
         ref={inputRef}
         type="file"
         accept={accept}
-        className="hidden"
-        onChange={(e) => pickFile(e.target.files?.[0])}
+        hidden
+        onChange={(e) => {
+          pick(e.target.files?.[0])
+          e.target.value = '' // let the same file be picked again
+        }}
       />
-      <div className="flex flex-col items-center gap-1">
-        <Upload size={18} />
-        <div className="font-semibold">{effectiveLabel}</div>
-        <div className="text-[var(--dim)] text-sm">{effectiveHint}</div>
-      </div>
-    </label>
+      <Upload size={20} aria-hidden="true" />
+      <span className="dropzone-title">{label ?? t('dropzone.dropImage')}</span>
+      <span className="dropzone-hint">{hint ?? t('common.browse')}</span>
+    </button>
   )
 }

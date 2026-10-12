@@ -14,24 +14,17 @@ type Props = {
 
 /**
  * Renders ASCII output either as plain text (fast) or with per-cell color spans.
- * Keeps the same pixel-panel styling as AsciiOutput.
+ * Shares the .ascii-screen look with AsciiOutput.
  */
 const AsciiColorOutput = forwardRef<HTMLPreElement, Props>(function AsciiColorOutput(
-  { text, colors, cols, rows, fontSize = 12, className, empty = 'Your image preview will appear here.' },
+  { text, colors, cols, rows, fontSize = 12, className, empty = '' },
   ref,
 ) {
   const hasColor = !!colors && colors.length === cols * rows
 
   return (
-    <pre
-      ref={ref}
-      className={cn(
-        'font-code whitespace-pre overflow-auto leading-[1] p-4 pixel-panel min-h-[280px] glow',
-        className,
-      )}
-      style={{ fontSize, color: 'var(--fg)', background: 'var(--panel)' }}
-    >
-      {!text && <span style={{ color: 'var(--dim)' }}>{empty}</span>}
+    <pre ref={ref} className={cn('ascii-screen', className)} style={{ fontSize }}>
+      {!text && empty && <span className="ascii-empty">{empty}</span>}
       {text && !hasColor && text}
       {text && hasColor && <ColoredGrid text={text} colors={colors!} cols={cols} rows={rows} />}
     </pre>
@@ -54,6 +47,7 @@ const ColoredGrid = memo(function ColoredGrid({
   const lines = text.split('\n')
   const out: React.ReactNode[] = []
   for (let y = 0; y < rows; y++) {
+    // Slice by code point so a multi-unit glyph is never split in half.
     const cells = Array.from(lines[y] ?? '')
     const chunks: React.ReactNode[] = []
     // Group adjacent characters that share a color to cut span count ~10x.

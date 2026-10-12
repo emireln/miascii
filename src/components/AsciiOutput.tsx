@@ -6,22 +6,21 @@ type Props = {
   empty?: string
   className?: string
   fontSize?: number
+  /** Swap ink and paper, e.g. for a light-on-dark figlet banner. */
+  inverted?: boolean
 }
 
 const AsciiOutput = forwardRef<HTMLPreElement, Props>(function AsciiOutput(
-  { text, empty = 'Your text preview will appear here.', className, fontSize = 14 },
+  { text, empty = '', className, fontSize = 14, inverted = false },
   ref,
 ) {
   return (
     <pre
       ref={ref}
-      className={cn(
-        'font-code whitespace-pre overflow-auto leading-[1] p-4 pixel-panel min-h-[280px] glow',
-        className,
-      )}
-      style={{ fontSize, color: 'var(--fg)', background: 'var(--panel)' }}
+      className={cn('ascii-screen', inverted && 'is-inverted', className)}
+      style={{ fontSize }}
     >
-      {text || <span style={{ color: 'var(--dim)' }}>{empty}</span>}
+      {text || (empty && <span className="ascii-empty">{empty}</span>)}
     </pre>
   )
 })

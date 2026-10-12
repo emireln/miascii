@@ -538,3 +538,111 @@ input[type="color"] { cursor: pointer; }
   transition: none !important;
   animation: none !important;
 }
+
+/* ------------------------------------------------------------------------ */
+/* Shared controls: picker, notice, output bar, ascii screen, sections      */
+/* ------------------------------------------------------------------------ */
+
+.pixel-btn--sm {
+  min-height: 1.9rem;
+  padding: 0.15rem 0.5rem;
+  font-size: 1.05rem;
+  box-shadow: 2px 2px 0 var(--shadow);
+}
+.pixel-btn--sm:active:not(:disabled) { transform: translate(2px, 2px); }
+
+.pixel-select { position: relative; width: 100%; }
+.pixel-select-trigger { width: 100%; min-height: 2.5rem; justify-content: space-between; text-align: left; }
+.pixel-select-value { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.pixel-select-chevron { flex: 0 0 auto; transition: transform 60ms steps(2); }
+.pixel-select-chevron.is-open { transform: rotate(180deg); }
+.pixel-select-menu {
+  position: fixed;
+  z-index: 120;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 6px 6px 0 var(--shadow);
+}
+.pixel-select-search { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border-bottom: 2px solid var(--line); }
+.pixel-select-search svg { flex: 0 0 auto; color: var(--mid); }
+.pixel-select-list { flex: 1 1 auto; min-height: 0; overflow: auto; outline: none; }
+.pixel-select-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 1px 10px;
+  font-size: 1.2rem;
+  cursor: pointer;
+}
+.pixel-select-option.is-active { background: var(--accent); color: var(--accent-fg); }
+.pixel-select-empty { padding: 6px 10px; color: var(--dim); font-size: 1.15rem; }
+.pixel-select-foot {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 4px 10px;
+  border-top: 2px solid var(--line);
+  color: var(--dim);
+  font-size: 1rem;
+}
+
+.notice {
+  padding: 8px 10px;
+  color: var(--danger);
+  background: var(--panel);
+  border: 2px solid var(--danger);
+  box-shadow: 3px 3px 0 var(--shadow);
+  font-size: 1.15rem;
+  line-height: 1.2;
+}
+
+.output-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 12px; }
+.output-heading { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; min-width: 0; }
+.output-title { margin: 0; }
+.output-status { color: var(--mid); font-size: 1.15rem; }
+.output-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+.ascii-screen {
+  flex: 1 1 auto;
+  min-height: 0;
+  margin: 0;
+  padding: 16px;
+  overflow: auto;
+  font-family: var(--font-code);
+  line-height: 1;
+  white-space: pre;
+  color: var(--fg);
+  background: var(--panel);
+  border: 2px solid var(--line);
+  box-shadow: 4px 4px 0 var(--shadow);
+}
+.ascii-screen.is-inverted { color: var(--panel); background: var(--fg); }
+.ascii-empty { color: var(--dim); font-family: var(--font-body); font-size: 1.3rem; white-space: normal; }
+
+.ctl-section { display: flex; flex-direction: column; gap: 10px; padding: 14px 0; border-top: 2px dashed var(--line); }
+.ctl-section:first-child { padding-top: 0; border-top: 0; }
+.ctl-title { margin: 0; }
+.ctl-body { display: flex; flex-direction: column; gap: 12px; }
+
+.color-field { display: flex; flex-direction: column; gap: 6px; }
+.color-row { display: flex; align-items: center; gap: 8px; }
+.swatch-pick { position: relative; display: inline-flex; flex: 0 0 auto; cursor: pointer; }
+.swatch { display: block; width: 28px; height: 28px; border: 2px solid var(--line); box-shadow: 2px 2px 0 var(--shadow); }
+.color-hex { padding: 4px 8px; background: var(--panel-2); border: 2px solid var(--line); font-size: 1.1rem; }
+
+.dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  width: 100%;
+  padding: 16px;
+  color: var(--fg);
+  text-align: center;
+}
+.dropzone-title { font-size: 1.25rem; }
+.dropzone-hint { color: var(--dim); font-size: 1.05rem; }
+.dropzone:hover .dropzone-hint,
+.dropzone[data-drag='true'] .dropzone-hint { color: inherit; }
