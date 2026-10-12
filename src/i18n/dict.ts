@@ -180,6 +180,12 @@ const en: Dict = {
   'image.output.title': 'Image preview',
   'image.output.colorWarning': 'color mode — larger images may slow the DOM',
   'image.error.unreadable': "couldn't read this file — try png, jpg, webp or gif",
+  'image.dither.none': 'none',
+  'image.dither.floyd': 'floyd–steinberg',
+  'image.dither.ordered': 'ordered (bayer)',
+  'image.color.off': 'monochrome',
+  'image.color.full': 'full color',
+  'image.color.duotone': 'duotone',
 
   // Video module
   'video.source.label': 'source',
