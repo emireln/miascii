@@ -10,6 +10,7 @@ import { Label, Slider, Toggle } from '../components/Control'
 import PixelSelect from '../components/PixelSelect'
 import {
   DENSITY_PRESETS,
+  resolveRamp,
   sourceToAscii,
   type AsciiOptions,
   type AsciiResult,
@@ -76,7 +77,7 @@ export default function VideoAscii() {
   const recordingRef = useRef(false)
 
   // Keep a live ref of all options so the RAF loop can read current values
-  const densityChars = customDensity.trim() || DENSITY_PRESETS[densityKey]
+  const densityChars = resolveRamp(customDensity, densityKey)
   const optsRef = useRef<AsciiOptions>({
     cols, density: densityChars, invert, color,
     duotoneA: duoA, duotoneB: duoB,

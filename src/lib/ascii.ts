@@ -13,6 +13,15 @@ export const DENSITY_PRESETS = {
 
 export type DensityKey = keyof typeof DENSITY_PRESETS
 
+/**
+ * Custom ramp wins when it has at least two characters (a lone character
+ * can't shade anything). Not trimmed: a leading or trailing space is the
+ * lightest glyph in a ramp.
+ */
+export function resolveRamp(custom: string, key: DensityKey): string {
+  return Array.from(custom).length > 1 ? custom : DENSITY_PRESETS[key]
+}
+
 export type CellColor = [number, number, number]
 
 export type AsciiResult = {
@@ -149,7 +158,8 @@ export function sourceToAscii(
   }
 
   // 3) Map luminance → ramp index (with optional dither)
-  const ramp = opts.density || ' .:-=+*#%@'
+  // Array.from splits by code point, so multi-unit glyphs (emoji) stay whole.
+  const ramp = Array.from(opts.density || ' .:-=+*#%@')
   const maxIdx = ramp.length - 1
   const idxArr = new Int16Array(total)
 

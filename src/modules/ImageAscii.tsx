@@ -9,6 +9,7 @@ import PixelSelect from '../components/PixelSelect'
 import {
   DENSITY_PRESETS,
   loadImageFile,
+  resolveRamp,
   sourceToAscii,
   type AsciiResult,
   type ColorMode,
@@ -50,7 +51,7 @@ export default function ImageAscii() {
   const scratchRef = useRef<HTMLCanvasElement | null>(null)
   if (!scratchRef.current) scratchRef.current = document.createElement('canvas')
 
-  const densityChars = customDensity.trim() || DENSITY_PRESETS[densityKey]
+  const densityChars = resolveRamp(customDensity, densityKey)
 
   useEffect(() => {
     if (!img) { setResult(null); return }
