@@ -709,6 +709,65 @@ input[type="color"] { cursor: pointer; }
   pointer-events: none;
 }
 
+a.pixel-btn { text-decoration: none; }
+.pixel-btn.is-danger { color: var(--danger); }
+
+/* Settings dialog */
+.modal-scrim {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+  background: rgb(0 0 0 / 60%);
+}
+.modal {
+  display: flex;
+  flex-direction: column;
+  width: min(640px, 100%);
+  max-height: calc(100vh - 32px);
+  box-shadow: 8px 8px 0 var(--shadow);
+  outline: none;
+}
+.modal-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 2px solid var(--line);
+}
+.modal-body { min-height: 0; overflow: auto; padding: 0 16px 16px; }
+
+.theme-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.theme-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-width: 0;
+  padding: 6px 8px;
+  color: var(--fg);
+  background: var(--panel);
+  border: 2px solid var(--line);
+  box-shadow: 2px 2px 0 var(--shadow);
+  font-size: 1.1rem;
+  text-align: left;
+}
+.theme-option:hover { background: var(--panel-2); }
+.theme-option[aria-pressed='true'] { background: var(--accent); color: var(--accent-fg); }
+.theme-swatch { display: grid; flex: 0 0 auto; width: 24px; height: 24px; place-items: center; border: 2px solid; }
+.theme-swatch > span { width: 8px; height: 8px; }
+.theme-name { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.about { display: flex; flex-direction: column; gap: 4px; }
+.about-name { font-family: var(--font-pixel); font-size: 0.8rem; line-height: 1.5; }
+.about-name span { color: var(--mid); font-size: 0.6rem; }
+
+.update-box { display: flex; flex-direction: column; gap: 8px; padding: 10px; border: 2px dashed var(--line); }
+.update-status { font-size: 1.15rem; line-height: 1.2; }
+
 .source-card { display: flex; align-items: center; gap: 10px; padding: 8px; box-shadow: 3px 3px 0 var(--shadow); }
 .source-thumb { flex: 0 0 auto; width: 44px; height: 44px; object-fit: cover; background: var(--panel-2); border: 2px solid var(--line); }
 .source-meta { display: flex; flex: 1; min-width: 0; flex-direction: column; }

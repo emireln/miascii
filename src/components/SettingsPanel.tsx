@@ -1,10 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
-import { X, Download, Upload, FolderOpen, Power, RotateCcw, Check } from 'lucide-react'
+import {
+  Check, Coffee, Download, ExternalLink, FolderOpen, Power, RefreshCw, RotateCcw, Upload, X,
+} from 'lucide-react'
+import pkg from '../../package.json'
 import { useT } from '../i18n'
-import { usePersisted, clearPersisted } from '../lib/usePersisted'
+import { clearPersisted, usePersisted } from '../lib/usePersisted'
 import { bridge, isElectron, type ElectronSettings } from '../lib/electronBridge'
 import { THEMES, normalizeTheme, type ThemeId } from '../lib/themes'
-import { Label, Slider, Toggle } from './Control'
+import { Label, Section, Slider, Toggle } from './Control'
+import Notice from './Notice'
 
 type Props = { open: boolean; onClose: () => void }
 
@@ -16,61 +20,134 @@ const DEFAULT_ELECTRON: ElectronSettings = {
   minimizeToTray: false,
 }
 
+const REPO_URL = 'https://github.com/emireln/miascii'
+const SUPPORT_URL = 'https://buymeacoffee.com/emireln'
+const MAX_IMPORT_BYTES = 1_000_000
+
+type UpdateState =
+  | { kind: 'idle' }
+  | { kind: 'checking' }
+  | { kind: 'upToDate' }
+  | { kind: 'available'; version: string }
+  | { kind: 'downloading'; percent: number }
+  | { kind: 'ready'; version: string }
+  | { kind: 'disabled' }
+  | { kind: 'error'; message: string }
+
+type SettingsFile = { settings: Record<string, unknown>; electron?: Partial<ElectronSettings> }
+
+/** Accepts only a miascii export: a JSON object whose settings hold miascii:* keys. */
+function parseSettingsFile(text: string): SettingsFile | null {
+  let data: unknown
+  try { data = JSON.parse(text) } catch { return null }
+  if (!data || typeof data !== 'object' || Array.isArray(data)) return null
+  const { settings, electron } = data as { settings?: unknown; electron?: unknown }
+  if (!settings || typeof settings !== 'object' || Array.isArray(settings)) return null
+  const entries = Object.entries(settings).filter(([k]) => k.startsWith('miascii:'))
+  if (entries.length === 0) return null
+  const electronPatch = electron && typeof electron === 'object' && !Array.isArray(electron)
+    ? (electron as Partial<ElectronSettings>)
+    : undefined
+  return { settings: Object.fromEntries(entries), electron: electronPatch }
+}
+
 /**
- * SettingsPanel — modal dialog with 4 sections:
- *   window & tray  (electron-only; disabled on web)
- *   appearance     (theme, reduce motion, UI scale — CSS vars on <html>)
- *   data           (export / import / reset / quit)
- *   about          (version, tagline, external link)
+ * Settings dialog: window & tray (desktop), appearance, data, about.
+ * Focus moves in on open, Tab stays inside, Escape closes, and focus returns
+ * to the opener.
  */
 export default function SettingsPanel({ open, onClose }: Props) {
   const t = useT()
+  const electron = isElectron()
   const [esettings, setEsettings] = useState<ElectronSettings>(DEFAULT_ELECTRON)
-  const [version, setVersion] = useState<string>('0.1.0')
-
-  // Renderer-only appearance prefs
   const [reduceMotion, setReduceMotion] = usePersisted<boolean>('ui.reduceMotion', false)
   const [uiScale, setUiScale] = usePersisted<number>('ui.scale', 100)
+  const [crt, setCrt] = usePersisted<number>('ui.crt', 15)
   const [themeRaw, setTheme] = usePersisted<ThemeId>('shell.theme', 'default-dark')
   const activeTheme = normalizeTheme(themeRaw)
-
+  const [update, setUpdate] = useState<UpdateState>({ kind: 'idle' })
+  const [importFailed, setImportFailed] = useState(false)
+  const [confirmReset, setConfirmReset] = useState(false)
+  const dialogRef = useRef<HTMLDivElement>(null)
   const importRef = useRef<HTMLInputElement>(null)
 
-  // Pull electron settings + listen for updates
+  // Electron settings: load once, then follow changes made from the tray menu.
   useEffect(() => {
-    if (!isElectron()) return
     const b = bridge()
     if (!b) return
     let alive = true
     b.settings.get().then((s) => { if (alive) setEsettings(s) })
-    b.app.version().then((v) => { if (alive) setVersion(v) })
     const off = b.settings.onUpdate((s) => setEsettings(s))
     return () => { alive = false; off() }
   }, [])
 
-  // Apply appearance CSS vars globally whenever they change
+  // Update events arrive only after a check. Stay subscribed for the component's
+  // lifetime so a result that lands while the dialog is closed is not lost.
   useEffect(() => {
-    const root = document.documentElement
-    root.style.fontSize = `${uiScale}%`
-    if (reduceMotion) root.classList.add('reduce-motion')
-    else root.classList.remove('reduce-motion')
-  }, [reduceMotion, uiScale])
+    const b = bridge()
+    if (!b) return
+    const offs = [
+      b.updater.onAvailable((info) => setUpdate({ kind: 'available', version: info.version })),
+      b.updater.onNotAvailable(() => setUpdate({ kind: 'upToDate' })),
+      b.updater.onDownloaded((info) => setUpdate({ kind: 'ready', version: info.version })),
+      b.updater.onProgress((p) => setUpdate({ kind: 'downloading', percent: p.percent })),
+      b.updater.onError((e) => setUpdate({ kind: 'error', message: e.error })),
+    ]
+    return () => offs.forEach((off) => off())
+  }, [])
 
-  // ESC closes
+  // Appearance applies whether or not the dialog is open.
+  useEffect(() => {
+    document.documentElement.style.fontSize = `${uiScale}%`
+  }, [uiScale])
+
+  useEffect(() => {
+    document.documentElement.classList.toggle('reduce-motion', reduceMotion)
+  }, [reduceMotion])
+
+  // Focus management while open.
   useEffect(() => {
     if (!open) return
-    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose() }
+    const opener = document.activeElement as HTMLElement | null
+    dialogRef.current?.focus()
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose()
+        return
+      }
+      if (e.key !== 'Tab' || !dialogRef.current) return
+      const items = focusable(dialogRef.current)
+      if (items.length === 0) return
+      const first = items[0]
+      const last = items[items.length - 1]
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
     window.addEventListener('keydown', onKey)
-    return () => window.removeEventListener('keydown', onKey)
+    return () => {
+      window.removeEventListener('keydown', onKey)
+      opener?.focus()
+    }
   }, [open, onClose])
+
+  // The reset button needs a second click; the armed state times out.
+  useEffect(() => {
+    if (!confirmReset) return
+    const id = window.setTimeout(() => setConfirmReset(false), 4000)
+    return () => window.clearTimeout(id)
+  }, [confirmReset])
 
   if (!open) return null
 
   const setEsetting = async <K extends keyof ElectronSettings>(k: K, v: ElectronSettings[K]) => {
     const b = bridge()
-    if (!b) { setEsettings((s) => ({ ...s, [k]: v })); return }
-    const next = await b.settings.set({ [k]: v })
-    setEsettings(next)
+    if (!b) return
+    setEsettings(await b.settings.set({ [k]: v }))
   }
 
   const exportAll = () => {
@@ -78,219 +155,264 @@ export default function SettingsPanel({ open, onClose }: Props) {
     for (let i = 0; i < localStorage.length; i++) {
       const key = localStorage.key(i)
       if (!key || !key.startsWith('miascii:')) continue
-      try { dump[key] = JSON.parse(localStorage.getItem(key) || 'null') }
-      catch { dump[key] = localStorage.getItem(key) }
+      try { dump[key] = JSON.parse(localStorage.getItem(key) ?? 'null') } catch { /* skip unreadable entries */ }
     }
     const blob = new Blob([JSON.stringify({
-      version, savedAt: new Date().toISOString(), settings: dump, electron: esettings,
+      app: 'miascii',
+      version: pkg.version,
+      savedAt: new Date().toISOString(),
+      settings: dump,
+      electron: esettings,
     }, null, 2)], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
-    a.href = URL.createObjectURL(blob)
+    a.href = url
     a.download = `miascii-settings-${Date.now()}.json`
     a.click()
-    setTimeout(() => URL.revokeObjectURL(a.href), 1000)
+    setTimeout(() => URL.revokeObjectURL(url), 10_000)
   }
 
   const importFile = async (file: File) => {
-    try {
-      const text = await file.text()
-      const parsed = JSON.parse(text)
-      if (parsed.settings && typeof parsed.settings === 'object') {
-        for (const [k, v] of Object.entries(parsed.settings)) {
-          if (k.startsWith('miascii:')) {
-            localStorage.setItem(k, JSON.stringify(v))
-          }
-        }
-      }
-      if (parsed.electron && isElectron()) {
-        await bridge()?.settings.set(parsed.electron)
-      }
-      window.location.reload()
-    } catch (e) {
-      alert(`import failed: ${(e as Error).message}`)
+    const parsed = file.size <= MAX_IMPORT_BYTES ? parseSettingsFile(await file.text()) : null
+    if (!parsed) {
+      setImportFailed(true)
+      return
     }
-  }
-
-  const resetAll = () => {
-    if (!confirm(t('settings.resetAll.confirm'))) return
-    clearPersisted()
-    if (isElectron()) bridge()?.settings.set(DEFAULT_ELECTRON).catch(() => {})
+    try {
+      for (const [k, v] of Object.entries(parsed.settings)) {
+        localStorage.setItem(k, JSON.stringify(v))
+      }
+    } catch {
+      setImportFailed(true)
+      return
+    }
+    if (electron && parsed.electron) await bridge()?.settings.set(parsed.electron)
     window.location.reload()
   }
 
-  const electron = isElectron()
-  const disabledCls = electron ? '' : 'opacity-50 pointer-events-none'
+  const resetAll = () => {
+    if (!confirmReset) {
+      setConfirmReset(true)
+      return
+    }
+    clearPersisted()
+    if (electron) bridge()?.settings.set(DEFAULT_ELECTRON).catch(() => {})
+    window.location.reload()
+  }
+
+  const checkForUpdates = async () => {
+    const b = bridge()
+    if (!b) return
+    setUpdate({ kind: 'checking' })
+    const result = await b.updater.check()
+    if (result.disabled) setUpdate({ kind: 'disabled' })
+    else if (result.error) setUpdate({ kind: 'error', message: result.error })
+  }
+
+  const downloadUpdate = async () => {
+    const b = bridge()
+    if (!b) return
+    setUpdate({ kind: 'downloading', percent: 0 })
+    const result = await b.updater.download()
+    if (result.error) setUpdate({ kind: 'error', message: result.error })
+  }
+
+  const updateText = (() => {
+    switch (update.kind) {
+      case 'idle': return t('settings.update.idle')
+      case 'checking': return t('settings.update.checking')
+      case 'upToDate': return t('settings.update.upToDate')
+      case 'available': return t('settings.update.available', { version: update.version })
+      case 'downloading': return t('settings.update.downloading', { percent: update.percent })
+      case 'ready': return t('settings.update.ready', { version: update.version })
+      case 'disabled': return t('settings.update.disabled')
+      case 'error': return t('settings.update.error', { message: update.message })
+    }
+  })()
+  const busy = update.kind === 'checking' || update.kind === 'downloading'
 
   return (
-    <div
-      className="fixed inset-0 z-[100] flex items-start justify-center p-4 sm:p-8 overflow-auto"
-      style={{ background: 'rgba(15,17,23,0.48)', backdropFilter: 'blur(6px)' }}
-      onClick={onClose}
-    >
+    <div className="modal-scrim" onMouseDown={onClose}>
       <div
-        className="pixel-panel w-full max-w-[720px] p-5 my-8 space-y-5"
-        style={{ background: 'var(--panel)' }}
+        ref={dialogRef}
+        className="modal pixel-panel"
         role="dialog"
         aria-modal="true"
         aria-labelledby="settings-title"
-        onClick={(e) => e.stopPropagation()}
+        tabIndex={-1}
+        onMouseDown={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between">
-          <div id="settings-title" className="text-lg font-semibold tracking-tight">
-            {t('settings.title')}
-          </div>
-          <button className="pixel-btn !px-2 !py-1" onClick={onClose} aria-label={t('common.close')}>
-            <X size={14} />
+        <header className="modal-head">
+          <h2 id="settings-title" className="pixel-label">{t('settings.title')}</h2>
+          <button type="button" className="pixel-btn pixel-btn--sm" onClick={onClose} aria-label={t('common.close')}>
+            <X size={14} aria-hidden="true" />
           </button>
-        </div>
+        </header>
 
-        {/* Window & Tray */}
-        <section className="space-y-3">
-          <div className="flex items-baseline gap-2">
-            <Label>{t('settings.section.window')}</Label>
-            {!electron && (
-              <span className="text-[var(--dim)] text-sm">{t('settings.desktop.only')}</span>
-            )}
-          </div>
-          <div className={`space-y-2 ${disabledCls}`}>
+        <div className="modal-body">
+          <Section title={t('settings.section.window')}>
+            {!electron && <p className="field-hint">{t('settings.desktop.only')}</p>}
             <Toggle
               value={esettings.closeToTray}
               onChange={(v) => setEsetting('closeToTray', v)}
               label={t('settings.closeToTray')}
+              disabled={!electron}
             />
-            <div className="text-[var(--dim)] text-sm pl-8 -mt-1">
-              {t('settings.closeToTray.hint')}
-            </div>
+            <p className="field-hint">{t('settings.closeToTray.hint')}</p>
             <Toggle
               value={esettings.minimizeToTray}
               onChange={(v) => setEsetting('minimizeToTray', v)}
               label={t('settings.minimizeToTray')}
+              disabled={!electron}
             />
             <Toggle
               value={esettings.startMinimized}
               onChange={(v) => setEsetting('startMinimized', v)}
               label={t('settings.startMinimized')}
+              disabled={!electron}
             />
             <Toggle
               value={esettings.alwaysOnTop}
               onChange={(v) => setEsetting('alwaysOnTop', v)}
               label={t('settings.alwaysOnTop')}
+              disabled={!electron}
             />
             <Toggle
               value={esettings.launchAtStartup}
               onChange={(v) => setEsetting('launchAtStartup', v)}
               label={t('settings.launchAtStartup')}
+              disabled={!electron}
             />
-          </div>
-        </section>
+          </Section>
 
-        <div className="divider" />
-
-        {/* Appearance */}
-        <section className="space-y-3">
-          <Label>{t('settings.section.appearance')}</Label>
-
-          <div>
-            <Label>{t('settings.theme')}</Label>
-            <div className="grid grid-cols-2 gap-2">
-              {THEMES.map((th) => {
-                const active = th.id === activeTheme
-                return (
-                  <button
-                    key={th.id}
-                    type="button"
-                    onClick={() => setTheme(th.id)}
-                    className="pixel-btn !px-2 !py-1.5 !text-xs justify-between"
-                    data-active={active}
-                    title={t(th.nameKey)}
-                  >
-                    <span className="flex items-center gap-2 min-w-0">
-                      <span
-                        aria-hidden
-                        style={{
-                          display: 'inline-block',
-                          width: 18,
-                          height: 18,
-                          flexShrink: 0,
-                          background: th.bg,
-                          border: `2px solid ${th.fg}`,
-                          borderRadius: 0,
-                        }}
-                      />
-                      <span className="truncate">{t(th.nameKey)}</span>
-                    </span>
-                    {active && <Check size={12} />}
-                  </button>
-                )
-              })}
+          <Section title={t('settings.section.appearance')}>
+            <div>
+              <Label>{t('settings.theme')}</Label>
+              <div className="theme-grid">
+                {THEMES.map((th) => {
+                  const active = th.id === activeTheme
+                  return (
+                    <button
+                      key={th.id}
+                      type="button"
+                      className="theme-option"
+                      aria-pressed={active}
+                      data-active={active}
+                      onClick={() => setTheme(th.id)}
+                    >
+                      <span className="theme-swatch" aria-hidden="true" style={{ background: th.bg, borderColor: th.fg }}>
+                        <span style={{ background: th.fg }} />
+                      </span>
+                      <span className="theme-name">{t(th.nameKey)}</span>
+                      {active && <Check size={12} aria-hidden="true" />}
+                    </button>
+                  )
+                })}
+              </div>
             </div>
-          </div>
+            <div>
+              <Label>{`${t('settings.crtIntensity')} (${crt}%)`}</Label>
+              <Slider value={crt} onChange={setCrt} min={0} max={100} step={5} label={t('settings.crtIntensity')} />
+            </div>
+            <div>
+              <Label>{`${t('settings.uiScale')} (${uiScale}%)`}</Label>
+              <Slider value={uiScale} onChange={setUiScale} min={80} max={140} step={5} label={t('settings.uiScale')} />
+            </div>
+            <Toggle value={reduceMotion} onChange={setReduceMotion} label={t('settings.reduceMotion')} />
+          </Section>
 
-          <div>
-            <Label>{`${t('settings.uiScale')} (${uiScale}%)`}</Label>
-            <Slider value={uiScale} onChange={setUiScale} min={80} max={140} step={5} />
-          </div>
-          <Toggle
-            value={reduceMotion}
-            onChange={setReduceMotion}
-            label={t('settings.reduceMotion')}
-          />
-        </section>
-
-        <div className="divider" />
-
-        {/* Data */}
-        <section className="space-y-2">
-          <Label>{t('settings.section.data')}</Label>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-            <button className="pixel-btn justify-start" onClick={exportAll}>
-              <Download size={14} />
-              {t('settings.export')}
-            </button>
-            <button
-              className="pixel-btn justify-start"
-              onClick={() => importRef.current?.click()}
-            >
-              <Upload size={14} />
-              {t('settings.import')}
-            </button>
-            {electron && (
-              <button
-                className="pixel-btn justify-start"
-                onClick={() => bridge()?.settings.revealFile()}
-              >
-                <FolderOpen size={14} />
-                {t('settings.revealFile')}
+          <Section title={t('settings.section.data')}>
+            <div className="btn-row">
+              <button type="button" className="pixel-btn" onClick={exportAll}>
+                <Download size={14} aria-hidden="true" />
+                {t('settings.export')}
               </button>
-            )}
-            <button
-              className="pixel-btn justify-start"
-              onClick={resetAll}
-              style={{ color: '#ff6b6b' }}
-            >
-              <RotateCcw size={14} />
-              {t('settings.resetAll')}
-            </button>
-            {electron && (
-              <button
-                className="pixel-btn justify-start sm:col-span-2"
-                onClick={() => bridge()?.app.quit()}
-                style={{ color: '#ff6b6b' }}
-              >
-                <Power size={14} />
-                {t('settings.quit')}
+              <button type="button" className="pixel-btn" onClick={() => importRef.current?.click()}>
+                <Upload size={14} aria-hidden="true" />
+                {t('settings.import')}
               </button>
+              {electron && (
+                <button type="button" className="pixel-btn" onClick={() => bridge()?.settings.revealFile()}>
+                  <FolderOpen size={14} aria-hidden="true" />
+                  {t('settings.revealFile')}
+                </button>
+              )}
+              <button type="button" className="pixel-btn is-danger" onClick={resetAll}>
+                <RotateCcw size={14} aria-hidden="true" />
+                {confirmReset ? t('settings.resetAll.sure') : t('settings.resetAll')}
+              </button>
+              {electron && (
+                <button type="button" className="pixel-btn is-danger" onClick={() => bridge()?.app.quit()}>
+                  <Power size={14} aria-hidden="true" />
+                  {t('settings.quit')}
+                </button>
+              )}
+            </div>
+            <input
+              ref={importRef}
+              type="file"
+              accept="application/json,.json"
+              hidden
+              onChange={(e) => {
+                const f = e.target.files?.[0]
+                e.target.value = ''
+                if (f) importFile(f)
+              }}
+            />
+            {importFailed && <Notice>{t('settings.import.invalid')}</Notice>}
+          </Section>
+
+          <Section title={t('settings.section.about')}>
+            <div className="about">
+              <div className="about-name">miascii <span>v{pkg.version}</span></div>
+              <p className="field-hint">{t('settings.about.tagline')}</p>
+            </div>
+            <div className="btn-row">
+              <a className="pixel-btn" href={REPO_URL} target="_blank" rel="noopener noreferrer">
+                <ExternalLink size={14} aria-hidden="true" />
+                {t('settings.about.repo')}
+              </a>
+              <a className="pixel-btn" href={SUPPORT_URL} target="_blank" rel="noopener noreferrer">
+                <Coffee size={14} aria-hidden="true" />
+                {t('shell.support')}
+              </a>
+            </div>
+            {electron && (
+              <div className="update-box">
+                <div className="update-status" role="status" aria-live="polite">{updateText}</div>
+                <div className="btn-row">
+                  {update.kind !== 'ready' && (
+                    <button type="button" className="pixel-btn" onClick={checkForUpdates} disabled={busy}>
+                      <RefreshCw size={14} aria-hidden="true" />
+                      {t('settings.check')}
+                    </button>
+                  )}
+                  {update.kind === 'available' && (
+                    <button type="button" className="pixel-btn" onClick={downloadUpdate}>
+                      <Download size={14} aria-hidden="true" />
+                      {t('settings.updateDownload')}
+                    </button>
+                  )}
+                  {update.kind === 'ready' && (
+                    <button type="button" className="pixel-btn" onClick={() => bridge()?.updater.install()}>
+                      <RefreshCw size={14} aria-hidden="true" />
+                      {t('settings.updateInstall')}
+                    </button>
+                  )}
+                </div>
+              </div>
             )}
-          </div>
-          <input
-            ref={importRef}
-            type="file"
-            accept="application/json,.json"
-            className="hidden"
-            onChange={(e) => { const f = e.target.files?.[0]; if (f) importFile(f) }}
-          />
-        </section>
+          </Section>
+        </div>
       </div>
     </div>
   )
+}
+
+function focusable(root: HTMLElement): HTMLElement[] {
+  return Array.from(
+    root.querySelectorAll<HTMLElement>(
+      'button:not([disabled]), input:not([disabled]), a[href], [tabindex]:not([tabindex="-1"])',
+    ),
+  ).filter((el) => el.offsetParent !== null)
 }

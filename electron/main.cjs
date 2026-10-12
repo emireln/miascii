@@ -308,7 +308,7 @@ ipcMain.handle('app:version', () => app.getVersion())
 // --- Auto-updater IPC handlers -----------------------------------------------
 ipcMain.handle('updater:check', async () => {
   if (isDev) {
-    return { error: 'Updates are disabled in development' }
+    return { disabled: true }
   }
   try {
     await autoUpdater.checkForUpdates()
@@ -320,7 +320,7 @@ ipcMain.handle('updater:check', async () => {
 
 ipcMain.handle('updater:download', async () => {
   if (isDev) {
-    return { error: 'Updates are disabled in development' }
+    return { disabled: true }
   }
   try {
     await autoUpdater.downloadUpdate()
@@ -332,7 +332,7 @@ ipcMain.handle('updater:download', async () => {
 
 ipcMain.handle('updater:install', () => {
   if (isDev) {
-    return { error: 'Updates are disabled in development' }
+    return { disabled: true }
   }
   autoUpdater.quitAndInstall()
   return { success: true }

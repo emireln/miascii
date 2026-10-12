@@ -16,6 +16,9 @@ export type UpdateInfo = {
   releaseNotes?: string
 }
 
+// `disabled` means updates are switched off (development builds), not a failure.
+export type UpdaterResult = { success?: boolean; error?: string; disabled?: boolean }
+
 export type UpdateProgress = {
   percent: number
   bytesPerSecond: number
@@ -40,9 +43,9 @@ type MiasciiBridge = {
     openExternal: (url: string) => Promise<void>
   }
   updater: {
-    check: () => Promise<{ success?: boolean; error?: string }>
-    download: () => Promise<{ success?: boolean; error?: string }>
-    install: () => Promise<{ success?: boolean; error?: string }>
+    check: () => Promise<UpdaterResult>
+    download: () => Promise<UpdaterResult>
+    install: () => Promise<UpdaterResult>
     onAvailable: (handler: (info: UpdateInfo) => void) => () => void
     onNotAvailable: (handler: () => void) => () => void
     onDownloaded: (handler: (info: UpdateInfo) => void) => () => void

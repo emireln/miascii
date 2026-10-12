@@ -9,7 +9,6 @@ import { normalizeTheme, THEMES, type ThemeId } from '../lib/themes'
 import { useT } from '../i18n'
 import LanguageSwitcher from './LanguageSwitcher'
 import SettingsPanel from './SettingsPanel'
-import { UpdateBanner } from './UpdateBanner'
 
 export type Mode = 'text' | 'image' | 'video'
 
@@ -69,7 +68,6 @@ export default function Shell({ mode, onMode, children }: Props) {
 
   return (
     <div className="app-shell">
-      <UpdateBanner />
       <div className="app-frame">
         {mobileNavOpen && (
           <button
