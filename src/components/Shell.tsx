@@ -27,8 +27,9 @@ const MODES: { id: Mode; labelKey: string; icon: LucideIcon }[] = [
 
 export default function Shell({ mode, onMode, children }: Props) {
   const t = useT()
-  const [themeRaw, setThemeRaw] = usePersisted<ThemeId>('shell.theme', 'default-light')
+  const [themeRaw, setThemeRaw] = usePersisted<ThemeId>('shell.theme', 'default-dark')
   const theme = normalizeTheme(themeRaw)
+  const isLight = THEMES.find((item) => item.id === theme)?.mode === 'light'
   const [navOpen, setNavOpen] = usePersisted<boolean>('shell.navOpen', true)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
   const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 700px)').matches)
@@ -140,11 +141,11 @@ export default function Shell({ mode, onMode, children }: Props) {
               <button
                 className="icon-button"
                 type="button"
-                onClick={() => setThemeRaw(theme === 'default-light' ? 'default-dark' : 'default-light')}
+                onClick={() => setThemeRaw(isLight ? 'default-dark' : 'default-light')}
                 aria-label={t('shell.toggleTheme')}
                 title={t('shell.toggleTheme')}
               >
-                {theme === 'default-light' ? <Moon size={18} /> : <Sun size={18} />}
+                {isLight ? <Moon size={18} /> : <Sun size={18} />}
               </button>
               <LanguageSwitcher />
               <button

@@ -1,3 +1,5 @@
+import '@fontsource/vt323/400.css'
+import '@fontsource/press-start-2p/400.css'
 import '@fontsource/fira-code/400.css'
 import '@fontsource/fira-code/500.css'
 import './styles/global.css'

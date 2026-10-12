@@ -31,7 +31,7 @@ export default function SettingsPanel({ open, onClose }: Props) {
   // Renderer-only appearance prefs
   const [reduceMotion, setReduceMotion] = usePersisted<boolean>('ui.reduceMotion', false)
   const [uiScale, setUiScale] = usePersisted<number>('ui.scale', 100)
-  const [themeRaw, setTheme] = usePersisted<ThemeId>('shell.theme', 'default-light')
+  const [themeRaw, setTheme] = usePersisted<ThemeId>('shell.theme', 'default-dark')
   const activeTheme = normalizeTheme(themeRaw)
 
   const importRef = useRef<HTMLInputElement>(null)
@@ -214,7 +214,7 @@ export default function SettingsPanel({ open, onClose }: Props) {
                           flexShrink: 0,
                           background: th.bg,
                           border: `2px solid ${th.fg}`,
-                          borderRadius: '50%',
+                          borderRadius: 0,
                         }}
                       />
                       <span className="truncate">{t(th.nameKey)}</span>
