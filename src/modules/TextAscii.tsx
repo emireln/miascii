@@ -77,6 +77,9 @@ export default function TextAscii() {
   }
   const [text, setText] = usePersisted<string>('text.input', 'miascii')
   const [font, setFont] = usePersisted<string>('text.font', 'Standard')
+  // A saved font can disappear from the catalog after an upgrade; fall back
+  // instead of showing "Font not found" forever.
+  const activeFont = FIGLET_FONTS.includes(font) ? font : 'Standard'
   const [fontSize, setFontSize] = usePersisted<number>('text.fontSize', 14)
   const [hLayout, setHLayout] = usePersisted<KerningMethod>('text.hLayout', 'default')
   const [maxWidth, setMaxWidth] = usePersisted<number>('text.maxWidth', 120)
@@ -98,7 +101,7 @@ export default function TextAscii() {
       setError(null)
       return
     }
-    renderFiglet(source, font, {
+    renderFiglet(source, activeFont, {
       horizontalLayout: hLayout,
       width: maxWidth,
       whitespaceBreak,
@@ -113,7 +116,7 @@ export default function TextAscii() {
       })
       .catch((e) => { if (!cancelled) setError(String(e?.message ?? e)) })
     return () => { cancelled = true }
-  }, [text, font, hLayout, maxWidth, whitespaceBreak, caseMode, border, trim])
+  }, [text, activeFont, hLayout, maxWidth, whitespaceBreak, caseMode, border, trim])
 
   const { chars, lines, cols } = useMemo(() => {
     const lns = output ? output.split('\n') : []
@@ -172,7 +175,7 @@ export default function TextAscii() {
           <Label>{t('text.font.label')}</Label>
           <div className="flex gap-2">
             <div className="flex-1 min-w-0">
-              <PixelSelect value={font} onChange={setFont} options={FIGLET_FONTS} />
+              <PixelSelect value={activeFont} onChange={setFont} options={FIGLET_FONTS} />
             </div>
             <button
               className="pixel-btn !px-2"
@@ -234,7 +237,7 @@ export default function TextAscii() {
         </div>
 
         <div className="divider pt-4 text-[var(--dim)] text-sm space-y-0.5">
-          <div>{t('text.statsFont', { font })}</div>
+          <div>{t('text.statsFont', { font: activeFont })}</div>
           <div>{t('text.statsSize', { cols, lines, chars })}</div>
         </div>
       </aside>
