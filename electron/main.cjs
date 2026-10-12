@@ -52,6 +52,31 @@ const DEFAULT_SETTINGS = {
   minimizeToTray: false, // also intercept minimize events
 }
 
+// The renderer is untrusted input: keep only known boolean keys.
+function sanitizeSettingsPatch(partial) {
+  const clean = {}
+  if (!partial || typeof partial !== 'object') return clean
+  for (const key of Object.keys(DEFAULT_SETTINGS)) {
+    if (typeof partial[key] === 'boolean') clean[key] = partial[key]
+  }
+  return clean
+}
+
+// Links opened in the system browser must be plain https.
+function isSafeExternalUrl(url) {
+  try { return new URL(url).protocol === 'https:' } catch { return false }
+}
+
+// Only the bundled app may load inside the window: Vite in dev, file:// packaged.
+function isAppUrl(url) {
+  try {
+    const parsed = new URL(url)
+    return isDev
+      ? parsed.origin === new URL(VITE_DEV_SERVER_URL).origin
+      : parsed.protocol === 'file:'
+  } catch { return false }
+}
+
 function settingsPath() {
   return path.join(app.getPath('userData'), 'settings.json')
 }
@@ -110,7 +135,8 @@ function createWindow() {
     backgroundColor: '#0a0a0a',
     autoHideMenuBar: true,
     title: 'miascii',
-    icon: process.platform === 'win32' ? ICON_ICO : ICON_PATH,
+    // build/ is not packaged into the asar, so only use the .ico when it exists.
+    icon: process.platform === 'win32' && fs.existsSync(ICON_ICO) ? ICON_ICO : ICON_PATH,
     show: !settings.startMinimized,
     alwaysOnTop: settings.alwaysOnTop,
     webPreferences: {
@@ -127,8 +153,15 @@ function createWindow() {
   })
 
   mainWindow.webContents.setWindowOpenHandler(({ url }) => {
-    shell.openExternal(url)
+    if (isSafeExternalUrl(url)) shell.openExternal(url)
     return { action: 'deny' }
+  })
+
+  // A stray link must not navigate the app window away from the bundled UI.
+  mainWindow.webContents.on('will-navigate', (event, url) => {
+    if (isAppUrl(url)) return
+    event.preventDefault()
+    if (isSafeExternalUrl(url)) shell.openExternal(url)
   })
 
   if (isDev) {
@@ -257,7 +290,8 @@ function applySettings(partial) {
 // --- IPC bridge --------------------------------------------------------------
 ipcMain.handle('settings:get', () => settings)
 ipcMain.handle('settings:set', (_e, partial) => {
-  if (partial && typeof partial === 'object') applySettings(partial)
+  const clean = sanitizeSettingsPatch(partial)
+  if (Object.keys(clean).length) applySettings(clean)
   return settings
 })
 ipcMain.handle('app:quit', () => { quitApp() })
@@ -267,7 +301,7 @@ ipcMain.handle('app:reveal-settings-file', () => {
   shell.showItemInFolder(settingsPath())
 })
 ipcMain.handle('app:open-external', (_e, url) => {
-  if (typeof url === 'string') shell.openExternal(url)
+  if (typeof url === 'string' && isSafeExternalUrl(url)) shell.openExternal(url)
 })
 ipcMain.handle('app:version', () => app.getVersion())
 
