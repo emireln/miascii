@@ -33,7 +33,10 @@ export default function VideoAscii() {
   // Source
   const [source, setSource] = useState<Source>('none')
   const [fileName, setFileName] = useState('')
-  const [videoUrl, setVideoUrl] = useState<string | null>(null)
+  // Object URL and camera stream live in refs so unmount cleanup can release them.
+  const videoUrlRef = useRef<string | null>(null)
+  const streamRef = useRef<MediaStream | null>(null)
+  const aliveRef = useRef(true)
   const [playing, setPlaying] = useState(false)
   const [fps, setFps] = usePersisted<number>('video.fps', 24)
   const [mirror, setMirror] = usePersisted<boolean>('video.mirror', true)
@@ -156,9 +159,9 @@ export default function VideoAscii() {
   // File upload handling
   const onFile = (file: File) => {
     stopWebcam()
-    if (videoUrl) URL.revokeObjectURL(videoUrl)
+    if (videoUrlRef.current) URL.revokeObjectURL(videoUrlRef.current)
     const url = URL.createObjectURL(file)
-    setVideoUrl(url)
+    videoUrlRef.current = url
     setFileName(file.name)
     setSource('file')
     setPlaying(true)
@@ -178,7 +181,10 @@ export default function VideoAscii() {
   const startWebcam = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: false })
-      if (videoUrl) { URL.revokeObjectURL(videoUrl); setVideoUrl(null) }
+      // Unmounted while the permission prompt was open: don't keep the camera on.
+      if (!aliveRef.current) { stream.getTracks().forEach((t) => t.stop()); return }
+      if (videoUrlRef.current) { URL.revokeObjectURL(videoUrlRef.current); videoUrlRef.current = null }
+      streamRef.current = stream
       setFileName('')
       setSource('webcam')
       setMirror(true)
@@ -198,17 +204,16 @@ export default function VideoAscii() {
   }
 
   const stopWebcam = () => {
-    const v = videoRef.current
-    const s = v?.srcObject as MediaStream | null
-    s?.getTracks().forEach((t) => t.stop())
-    if (v) v.srcObject = null
+    streamRef.current?.getTracks().forEach((t) => t.stop())
+    streamRef.current = null
+    if (videoRef.current) videoRef.current.srcObject = null
   }
 
   const clearSource = () => {
     setPlaying(false)
     stopWebcam()
-    if (videoUrl) URL.revokeObjectURL(videoUrl)
-    setVideoUrl(null)
+    if (videoUrlRef.current) URL.revokeObjectURL(videoUrlRef.current)
+    videoUrlRef.current = null
     setFileName('')
     setSource('none')
     setHasFrame(false)
@@ -218,11 +223,14 @@ export default function VideoAscii() {
     if (preRef.current) preRef.current.textContent = ''
   }
 
-  // Cleanup on unmount
-  useEffect(() => () => {
-    stopWebcam()
-    if (videoUrl) URL.revokeObjectURL(videoUrl)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+  // Cleanup on unmount: the camera must turn off when leaving video mode.
+  useEffect(() => {
+    aliveRef.current = true
+    return () => {
+      aliveRef.current = false
+      stopWebcam()
+      if (videoUrlRef.current) URL.revokeObjectURL(videoUrlRef.current)
+    }
   }, [])
 
   const togglePlay = () => {
