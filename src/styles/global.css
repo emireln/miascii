@@ -710,6 +710,35 @@ input[type="color"] { cursor: pointer; }
 }
 
 a.pixel-btn { text-decoration: none; }
+
+/* Language menu (topbar) */
+.lang-switch { position: relative; }
+.lang-code { text-transform: uppercase; }
+.lang-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  right: 0;
+  z-index: 110;
+  display: flex;
+  flex-direction: column;
+  min-width: 200px;
+  max-height: 360px;
+  overflow: auto;
+  box-shadow: 6px 6px 0 var(--shadow);
+}
+.lang-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 4px 10px;
+  font-size: 1.2rem;
+  text-align: left;
+}
+.lang-option:hover { background: var(--panel-2); }
+.lang-option[aria-checked='true'] { background: var(--accent); color: var(--accent-fg); }
+.lang-id { color: var(--dim); font-size: 1rem; text-transform: uppercase; }
+.lang-option[aria-checked='true'] .lang-id { color: inherit; }
 .pixel-btn.is-danger { color: var(--danger); }
 
 /* Settings dialog */

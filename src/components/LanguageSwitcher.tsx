@@ -1,57 +1,60 @@
 import { useEffect, useRef, useState } from 'react'
 import { Languages, Check } from 'lucide-react'
 import { LOCALES, useI18n } from '../i18n'
-import { cn } from '../lib/cn'
 
 export default function LanguageSwitcher() {
   const { locale, setLocale, t } = useI18n()
   const [open, setOpen] = useState(false)
   const ref = useRef<HTMLDivElement>(null)
+  const current = LOCALES.find((l) => l.id === locale) ?? LOCALES[0]
 
   useEffect(() => {
     if (!open) return
-    const onDoc = (e: MouseEvent) => {
-      if (!ref.current) return
-      if (!ref.current.contains(e.target as Node)) setOpen(false)
+    const onDown = (e: MouseEvent) => {
+      if (!ref.current?.contains(e.target as Node)) setOpen(false)
     }
-    document.addEventListener('mousedown', onDoc)
-    return () => document.removeEventListener('mousedown', onDoc)
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setOpen(false)
+    }
+    document.addEventListener('mousedown', onDown)
+    document.addEventListener('keydown', onKey)
+    return () => {
+      document.removeEventListener('mousedown', onDown)
+      document.removeEventListener('keydown', onKey)
+    }
   }, [open])
 
-  const current = LOCALES.find((l) => l.id === locale) ?? LOCALES[0]
-
   return (
-    <div ref={ref} className="relative">
+    <div ref={ref} className="lang-switch">
       <button
-        className="pixel-btn !px-2 !py-1"
-        onClick={() => setOpen((o) => !o)}
-        aria-label={t('shell.language')}
+        type="button"
+        className="pixel-btn pixel-btn--sm"
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-label={`${t('shell.language')}: ${current.native}`}
         title={t('shell.language')}
+        onClick={() => setOpen((o) => !o)}
       >
-        <Languages size={14} />
-        <span className="text-sm uppercase tracking-wide">{current.id}</span>
+        <Languages size={14} aria-hidden="true" />
+        <span className="lang-code">{current.id}</span>
       </button>
       {open && (
-        <div
-          className="absolute right-0 mt-1 z-50 pixel-panel !p-0 min-w-[180px] max-h-[320px] overflow-auto"
-          style={{ background: 'var(--panel)' }}
-        >
+        <div role="menu" aria-label={t('shell.language')} className="pixel-panel lang-menu">
           {LOCALES.map((l) => {
             const active = l.id === locale
             return (
               <button
                 key={l.id}
-                className={cn(
-                  'w-full flex items-center justify-between gap-2 px-3 py-1.5 text-left text-sm',
-                  'hover:bg-[var(--accent-soft)] hover:text-[var(--accent)]',
-                )}
+                type="button"
+                role="menuitemradio"
+                aria-checked={active}
+                lang={l.id}
+                className="lang-option"
                 onClick={() => { setLocale(l.id); setOpen(false) }}
               >
-                <span>
-                  <span className="font-medium">{l.native}</span>
-                  <span className="text-[var(--dim)] text-xs ml-2 uppercase">{l.id}</span>
-                </span>
-                {active && <Check size={12} />}
+                <span>{l.native}</span>
+                <span className="lang-id">{l.id}</span>
+                {active && <Check size={12} aria-hidden="true" />}
               </button>
             )
           })}
