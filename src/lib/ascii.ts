@@ -135,12 +135,15 @@ export function sourceToAscii(
         const gy = -tl - 2 * tc - tr + bll + 2 * bc + br
         const mag = Math.sqrt(gx * gx + gy * gy) / 4 // normalize roughly
         edgeMag[i] = mag
-        // Direction → char
-        const ang = Math.atan2(gy, gx) // -π..π
-        // Map to 4 bins: -, /, |, \
-        let a4 = Math.round(((ang + Math.PI) / Math.PI) * 4) % 4
-        if (a4 < 0) a4 += 4
-        edgeChar[i] = a4
+        // The edge runs perpendicular to the gradient, so use (-gy, gx) as its
+        // direction and pick the glyph whose slope matches (no trig needed).
+        const ex = -gy
+        const ey = gx
+        const ax = Math.abs(ex)
+        const ay = Math.abs(ey)
+        if (ax > ay * 2.414) edgeChar[i] = 0 // '-' within 22.5° of horizontal
+        else if (ay > ax * 2.414) edgeChar[i] = 2 // '|' within 22.5° of vertical
+        else edgeChar[i] = ex * ey > 0 ? 3 : 1 // '\' or '/' (y grows downward)
       }
     }
   }
