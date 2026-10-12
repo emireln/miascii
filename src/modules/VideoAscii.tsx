@@ -63,6 +63,7 @@ export default function VideoAscii() {
   const [actualFps, setActualFps] = useState(0)
   const [hasFrame, setHasFrame] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   // Recording
   const [recording, setRecording] = useState(false)
@@ -159,6 +160,7 @@ export default function VideoAscii() {
   // File upload handling
   const onFile = (file: File) => {
     stopWebcam()
+    setError(null)
     if (videoUrlRef.current) URL.revokeObjectURL(videoUrlRef.current)
     const url = URL.createObjectURL(file)
     videoUrlRef.current = url
@@ -185,6 +187,7 @@ export default function VideoAscii() {
       if (!aliveRef.current) { stream.getTracks().forEach((t) => t.stop()); return }
       if (videoUrlRef.current) { URL.revokeObjectURL(videoUrlRef.current); videoUrlRef.current = null }
       streamRef.current = stream
+      setError(null)
       setFileName('')
       setSource('webcam')
       setMirror(true)
@@ -199,7 +202,7 @@ export default function VideoAscii() {
       }, 0)
     } catch (e) {
       console.error('webcam denied', e)
-      alert(t('video.cameraDenied'))
+      setError(t('video.cameraDenied'))
     }
   }
 
@@ -216,6 +219,7 @@ export default function VideoAscii() {
     videoUrlRef.current = null
     setFileName('')
     setSource('none')
+    setError(null)
     setHasFrame(false)
     hasFrameRef.current = false
     lastResultRef.current = null
@@ -352,6 +356,7 @@ export default function VideoAscii() {
               </button>
             </div>
           )}
+          {error && <div role="alert" className="text-sm mt-2" style={{ color: 'var(--danger)' }}>{error}</div>}
         </div>
 
         <div className="flex gap-2">
@@ -599,6 +604,7 @@ export default function VideoAscii() {
           loop={source === 'file'}
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}
+          onError={() => { setPlaying(false); setError(t('video.error.unplayable')) }}
         />
       </section>
     </div>

@@ -162,6 +162,7 @@ const en: Dict = {
   'image.stats': '{cols}×{rows} · {chars} chars',
   'image.output.title': 'Image preview',
   'image.output.colorWarning': 'color mode — larger images may slow the DOM',
+  'image.error.unreadable': "couldn't read this file — try png, jpg, webp or gif",
 
   // Video module
   'video.source.label': 'source',
@@ -186,6 +187,7 @@ const en: Dict = {
   'video.recorderFailed': 'failed to start recorder',
   'video.cameraDenied': 'camera permission denied',
   'video.copyFrame': 'copy frame',
+  'video.error.unplayable': "couldn't play this file — try mp4, webm or mov",
 }
 
 // --- Spanish ------------------------------------------------------------------

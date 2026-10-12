@@ -46,8 +46,10 @@ export default function ImageAscii() {
   const [fontSize, setFontSize] = usePersisted<number>('image.fontSize', 10)
   const [result, setResult] = useState<AsciiResult | null>(null)
   const [copied, setCopied] = useState(false)
+  const [error, setError] = useState<string | null>(null)
 
   const preRef = useRef<HTMLPreElement>(null)
+  const srcRef = useRef<string | null>(null) // object URL of the loaded image
   const scratchRef = useRef<HTMLCanvasElement | null>(null)
   if (!scratchRef.current) scratchRef.current = document.createElement('canvas')
 
@@ -84,17 +86,27 @@ export default function ImageAscii() {
     flipH, flipV, charAspect,
   ])
 
+  // Release the object URL when leaving image mode.
+  useEffect(() => () => { if (srcRef.current) URL.revokeObjectURL(srcRef.current) }, [])
+
   const onFile = async (file: File) => {
     try {
       const loaded = await loadImageFile(file)
+      if (srcRef.current) URL.revokeObjectURL(srcRef.current)
+      srcRef.current = loaded.src
       setImg(loaded)
       setFileName(file.name)
-    } catch (e) {
-      console.error(e)
+      setError(null)
+    } catch {
+      setError(t('image.error.unreadable'))
     }
   }
 
-  const clearImg = () => { setImg(null); setFileName(''); setResult(null) }
+  const clearImg = () => {
+    if (srcRef.current) URL.revokeObjectURL(srcRef.current)
+    srcRef.current = null
+    setImg(null); setFileName(''); setResult(null); setError(null)
+  }
 
   const handleCopy = async () => {
     if (!result) return
@@ -136,6 +148,7 @@ export default function ImageAscii() {
               </button>
             </div>
           )}
+          {error && <div role="alert" className="text-sm mt-2" style={{ color: 'var(--danger)' }}>{error}</div>}
         </div>
 
         <div>
