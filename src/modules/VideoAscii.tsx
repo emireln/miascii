@@ -141,7 +141,6 @@ export default function VideoAscii() {
           fg: fg.trim() || '#fff',
           bg: bg.trim() || '#000',
         })
-        setRecElapsed(Math.floor((performance.now() - recStartRef.current) / 1000))
       }
 
       // FPS sampling
@@ -154,8 +153,20 @@ export default function VideoAscii() {
       }
     }
     raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
+    return () => {
+      cancelAnimationFrame(raf)
+      setActualFps(0)
+    }
   }, [playing])
+
+  // Elapsed-time readout ticks once a second, not once per rendered frame.
+  useEffect(() => {
+    if (!recording) return
+    const id = window.setInterval(() => {
+      setRecElapsed(Math.floor((performance.now() - recStartRef.current) / 1000))
+    }, 1000)
+    return () => window.clearInterval(id)
+  }, [recording])
 
   // File upload handling
   const onFile = (file: File) => {
