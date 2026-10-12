@@ -54,17 +54,24 @@ export function usePersisted<T>(
     return initial
   })
 
+  // The last value known to be in storage (or the one we just received).
+  // Writes happen only when `value` differs from it. A "first render" flag
+  // would break under StrictMode, which re-runs effects on mount and would
+  // overwrite a saved value with the default.
+  const stored = useRef<T>(value)
+
   // Subscribe to broadcasts from siblings writing the same key
   useEffect(() => {
     return subscribe(storageKey, (v) => {
+      stored.current = v as T
       setValue(v as T)
     })
   }, [storageKey])
 
-  // Persist + broadcast on value change, except on the first render
-  const first = useRef(true)
+  // Persist + broadcast on value change
   useEffect(() => {
-    if (first.current) { first.current = false; return }
+    if (Object.is(stored.current, value)) return
+    stored.current = value
     try {
       window.localStorage.setItem(storageKey, JSON.stringify(value))
     } catch {
