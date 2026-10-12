@@ -199,7 +199,7 @@ esc           close the settings panel / dropdowns
 - [ ] Custom ramp picker drag-and-drop
 - [ ] Configurable hotkeys in Settings
 - [ ] Publish to winget / brew / snap
-- [ ] Dark theme variants (amber, green phosphor)
+- [x] Dark theme variants (amber, green phosphor)
 
 ---
 
