@@ -1,1 +1,9 @@
-/* Kept as an import target for older builds; CRT overlays are no longer used. */
+/* CRT scanlines: a fixed, click-through overlay. Strength is --crt (0 to 1), set from Settings. */
+.crt-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  pointer-events: none;
+  opacity: var(--crt, 0);
+  background: repeating-linear-gradient(to bottom, transparent 0 2px, rgb(0 0 0 / 55%) 2px 3px);
+}

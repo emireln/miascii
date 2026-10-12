@@ -19,11 +19,13 @@ type Props = {
   children: React.ReactNode
 }
 
-const MODES: { id: Mode; labelKey: string; icon: LucideIcon }[] = [
-  { id: 'text', labelKey: 'shell.mode.text', icon: Type },
-  { id: 'image', labelKey: 'shell.mode.image', icon: ImageIcon },
-  { id: 'video', labelKey: 'shell.mode.video', icon: Video },
+const MODES: { id: Mode; labelKey: string; descKey: string; icon: LucideIcon }[] = [
+  { id: 'text', labelKey: 'shell.mode.text', descKey: 'shell.desc.text', icon: Type },
+  { id: 'image', labelKey: 'shell.mode.image', descKey: 'shell.desc.image', icon: ImageIcon },
+  { id: 'video', labelKey: 'shell.mode.video', descKey: 'shell.desc.video', icon: Video },
 ]
+
+const MOBILE_QUERY = '(max-width: 700px)'
 
 export default function Shell({ mode, onMode, children }: Props) {
   const t = useT()
@@ -31,13 +33,14 @@ export default function Shell({ mode, onMode, children }: Props) {
   const theme = normalizeTheme(themeRaw)
   const isLight = THEMES.find((item) => item.id === theme)?.mode === 'light'
   const [navOpen, setNavOpen] = usePersisted<boolean>('shell.navOpen', true)
+  const [crt] = usePersisted<number>('ui.crt', 15)
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
-  const [isMobile, setIsMobile] = useState(() => window.matchMedia('(max-width: 700px)').matches)
+  const [isMobile, setIsMobile] = useState(() => window.matchMedia(MOBILE_QUERY).matches)
   const [settingsOpen, setSettingsOpen] = useState(false)
   const currentMode = MODES.find((item) => item.id === mode) ?? MODES[0]
 
   useEffect(() => {
-    const media = window.matchMedia('(max-width: 700px)')
+    const media = window.matchMedia(MOBILE_QUERY)
     const sync = () => {
       setIsMobile(media.matches)
       if (!media.matches) setMobileNavOpen(false)
@@ -48,12 +51,16 @@ export default function Shell({ mode, onMode, children }: Props) {
   }, [])
 
   useEffect(() => {
-    const root = document.documentElement
-    root.dataset.theme = theme
-    const definition = THEMES.find((item) => item.id === theme)
-    if (definition?.mode === 'light') root.classList.add('light')
-    else root.classList.remove('light')
+    document.documentElement.dataset.theme = theme
   }, [theme])
+
+  useEffect(() => {
+    document.documentElement.style.setProperty('--crt', String(crt / 100))
+  }, [crt])
+
+  useEffect(() => {
+    document.title = `miascii — ${t(currentMode.labelKey)}`
+  }, [currentMode.labelKey, t])
 
   const chooseMode = (nextMode: Mode) => {
     onMode(nextMode)
@@ -81,7 +88,7 @@ export default function Shell({ mode, onMode, children }: Props) {
             </div>
           </div>
 
-          <div className="sidebar-section-label">{t('shell.modes')}</div>
+          <div className="sidebar-section-label pixel-label">{t('shell.modes')}</div>
           <nav className="mode-nav" aria-label={t('shell.modes')}>
             {MODES.map(({ id, labelKey, icon: Icon }) => (
               <button
@@ -120,22 +127,22 @@ export default function Shell({ mode, onMode, children }: Props) {
           <header className="app-topbar">
             <div className="topbar-leading">
               <button
-                className="icon-button topbar-mobile-menu"
+                className="icon-button"
                 type="button"
                 aria-label={isMobile
                   ? t(mobileNavOpen ? 'shell.hideSidebar' : 'shell.showSidebar')
                   : t(navOpen ? 'shell.hideSidebar' : 'shell.showSidebar')}
+                aria-expanded={isMobile ? mobileNavOpen : navOpen}
                 onClick={() => {
                   if (isMobile) setMobileNavOpen((open) => !open)
                   else setNavOpen((open) => !open)
                 }}
               >
-                <span className="desktop-only">
-                  {navOpen ? <PanelLeftClose size={19} /> : <PanelLeftOpen size={19} />}
-                </span>
-                <Menu className="mobile-only" size={20} />
+                {isMobile ? <Menu size={20} aria-hidden="true" /> : navOpen
+                  ? <PanelLeftClose size={19} aria-hidden="true" />
+                  : <PanelLeftOpen size={19} aria-hidden="true" />}
               </button>
-              <span>{t(currentMode.labelKey)}</span>
+              {isMobile && <span className="topbar-title pixel-label">miascii</span>}
             </div>
             <div className="topbar-actions">
               <button
@@ -145,7 +152,7 @@ export default function Shell({ mode, onMode, children }: Props) {
                 aria-label={t('shell.toggleTheme')}
                 title={t('shell.toggleTheme')}
               >
-                {isLight ? <Moon size={18} /> : <Sun size={18} />}
+                {isLight ? <Moon size={18} aria-hidden="true" /> : <Sun size={18} aria-hidden="true" />}
               </button>
               <LanguageSwitcher />
               <button
@@ -155,25 +162,24 @@ export default function Shell({ mode, onMode, children }: Props) {
                 aria-label={t('settings.open')}
                 title={t('settings.open')}
               >
-                <SettingsIcon size={18} />
+                <SettingsIcon size={18} aria-hidden="true" />
               </button>
             </div>
           </header>
 
           <main className="app-content">
             <div className="content-wrap">
-              <div className="page-heading">
-                <div>
-                  <p>{t('shell.modes')}</p>
-                  <h1>{t(currentMode.labelKey)}</h1>
-                </div>
-              </div>
+              <header className="page-heading">
+                <h1>{t(currentMode.labelKey)}</h1>
+                <p>{t(currentMode.descKey)}</p>
+              </header>
               {children}
             </div>
           </main>
         </div>
       </div>
 
+      {crt > 0 && <div className="crt-overlay" aria-hidden="true" />}
       <SettingsPanel open={settingsOpen} onClose={() => setSettingsOpen(false)} />
     </div>
   )

@@ -42,6 +42,9 @@ const en: Dict = {
   'shell.mode.video': 'Video',
   'shell.footer.clientOnly': '█ client-side only',
   'shell.footer.noUpload': 'Your files stay on this device',
+  'shell.desc.text': 'figlet banners from typed text',
+  'shell.desc.image': 'photos and graphics as character art',
+  'shell.desc.video': 'video files and live webcam, rendered frame by frame',
   'shell.footer.ready': 'ready',
   'shell.language': 'language',
 

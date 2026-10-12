@@ -441,9 +441,10 @@ input[type="color"] { cursor: pointer; }
 .mobile-only { display: none; }
 .app-content { min-height: 0; flex: 1; overflow: auto; padding: 24px; }
 .content-wrap { width: 100%; max-width: 1520px; margin: 0 auto; }
-.page-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; margin-bottom: 20px; }
+.page-heading { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
 .page-heading h1 { margin: 0; color: var(--fg); font-family: var(--font-pixel); font-size: 1.1rem; font-weight: 400; line-height: 1.4; }
-.page-heading p { margin: 6px 0 0; color: var(--mid); font-size: 1.15rem; }
+.page-heading p { margin: 0; color: var(--mid); font-size: 1.2rem; }
+.topbar-title { margin-left: 4px; color: var(--fg); }
 .sidebar-scrim { display: none; }
 
 /* ------------------------------------------------------------------------ */
