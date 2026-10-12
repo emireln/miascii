@@ -54,7 +54,7 @@ const ColoredGrid = memo(function ColoredGrid({
   const lines = text.split('\n')
   const out: React.ReactNode[] = []
   for (let y = 0; y < rows; y++) {
-    const line = lines[y] ?? ''
+    const cells = Array.from(lines[y] ?? '')
     const chunks: React.ReactNode[] = []
     // Group adjacent characters that share a color to cut span count ~10x.
     let runStart = 0
@@ -67,7 +67,7 @@ const ColoredGrid = memo(function ColoredGrid({
         const [r, g, b] = runColor
         chunks.push(
           <span key={`${y}-${runStart}`} style={{ color: `rgb(${r},${g},${b})` }}>
-            {line.slice(runStart, x)}
+            {cells.slice(runStart, x).join('')}
           </span>,
         )
         runStart = x

@@ -16,7 +16,7 @@ import {
   type DensityKey,
   type DitherMode,
 } from '../lib/ascii'
-import { copyText, downloadNodeAsPng, downloadText } from '../lib/export'
+import { copyText, downloadAsciiPng, downloadText } from '../lib/export'
 
 const DENSITY_KEYS = Object.keys(DENSITY_PRESETS) as DensityKey[]
 const DITHER_MODES: DitherMode[] = ['none', 'floyd-steinberg', 'ordered']
@@ -315,7 +315,7 @@ export default function ImageAscii() {
           </button>
           <button
             className="pixel-btn w-full justify-start"
-            onClick={() => preRef.current && downloadNodeAsPng(preRef.current, 'miascii-image.png')}
+            onClick={() => result && preRef.current && downloadAsciiPng(result, preRef.current, 'miascii-image.png')}
             disabled={!result}
           >
             <ImageIcon size={14} />

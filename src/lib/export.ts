@@ -1,58 +1,56 @@
-import html2canvas from 'html2canvas'
+import type { AsciiResult } from './ascii'
+import { paintAsciiToCanvas } from './asciiCanvas'
 
-export async function copyText(text: string) {
+/** Clipboard write, with a fallback for non-secure (plain http) origins. */
+export async function copyText(text: string): Promise<boolean> {
   try {
     await navigator.clipboard.writeText(text)
     return true
   } catch {
-    return false
+    const field = document.createElement('textarea')
+    field.value = text
+    field.setAttribute('readonly', '')
+    field.style.position = 'fixed'
+    field.style.opacity = '0'
+    document.body.appendChild(field)
+    field.select()
+    const ok = document.execCommand('copy')
+    field.remove()
+    return ok
   }
 }
 
 export function downloadText(text: string, filename = 'miascii.txt') {
   try {
-    const blob = new Blob([text], { type: 'text/plain;charset=utf-8' })
-    const url = URL.createObjectURL(blob)
-    triggerDownload(url, filename)
-    setTimeout(() => URL.revokeObjectURL(url), 10_000)
+    downloadBlob(new Blob([text], { type: 'text/plain;charset=utf-8' }), filename)
   } catch (err) {
     console.error('Failed to download text:', err)
   }
 }
 
-export async function downloadNodeAsPng(node: HTMLElement, filename = 'miascii.png') {
+/**
+ * Paints the grid straight onto a canvas with the app's mono font and the
+ * preview's colors. Crisper than a DOM screenshot and it keeps per-cell color.
+ */
+export async function downloadAsciiPng(result: AsciiResult, preview: HTMLElement, filename = 'miascii.png') {
   try {
-    const computed = getComputedStyle(node)
-    const bg = computed.backgroundColor && computed.backgroundColor !== 'rgba(0, 0, 0, 0)'
-      ? computed.backgroundColor
-      : (getComputedStyle(document.body).backgroundColor || '#0a0a0a')
-
-    const canvas = await html2canvas(node, {
-      backgroundColor: bg,
-      scale: 2,
-      logging: false,
-      useCORS: true,
-    })
-    canvas.toBlob((blob) => {
-      if (!blob) return
-      const url = URL.createObjectURL(blob)
-      triggerDownload(url, filename)
-      setTimeout(() => URL.revokeObjectURL(url), 10_000)
-    }, 'image/png')
+    const style = getComputedStyle(preview)
+    await document.fonts.load('24px "Fira Code"')
+    const canvas = document.createElement('canvas')
+    paintAsciiToCanvas(canvas, result, { fontPx: 24, pad: 24, fg: style.color, bg: style.backgroundColor })
+    canvas.toBlob((blob) => { if (blob) downloadBlob(blob, filename) }, 'image/png')
   } catch (err) {
     console.error('Failed to download PNG:', err)
   }
 }
 
-function triggerDownload(url: string, filename: string) {
+function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
   a.download = filename
   a.style.display = 'none'
   document.body.appendChild(a)
   a.click()
-  // Clean up element after dispatching click
-  setTimeout(() => {
-    if (a.parentNode) a.parentNode.removeChild(a)
-  }, 100)
+  setTimeout(() => { a.remove(); URL.revokeObjectURL(url) }, 10_000)
 }

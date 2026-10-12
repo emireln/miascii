@@ -16,22 +16,21 @@ export function paintAsciiToPre(pre: HTMLPreElement, result: AsciiResult): void 
   const lines = text.split('\n')
   let html = ''
   for (let y = 0; y < rows; y++) {
-    const line = lines[y] ?? ''
+    // Slice by code point so a multi-unit glyph is never split in half.
+    const cells = Array.from(lines[y] ?? '')
     let runStart = 0
     let runColor = colors[y * cols] ?? [255, 255, 255]
-    let rowHtml = ''
     for (let x = 1; x <= cols; x++) {
       const c = x < cols ? colors[y * cols + x] : null
       const same = c && c[0] === runColor[0] && c[1] === runColor[1] && c[2] === runColor[2]
       if (!same) {
-        rowHtml += `<span style="color:rgb(${runColor[0]},${runColor[1]},${runColor[2]})">${escapeHtml(
-          line.slice(runStart, x),
-        )}</span>`
+        const [r, g, b] = runColor
+        html += `<span style="color:rgb(${r},${g},${b})">${escapeHtml(cells.slice(runStart, x).join(''))}</span>`
         runStart = x
         if (c) runColor = c
       }
     }
-    html += rowHtml + '\n'
+    html += '\n'
   }
   pre.innerHTML = html
 }

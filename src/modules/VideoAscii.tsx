@@ -20,7 +20,7 @@ import {
 } from '../lib/ascii'
 import { paintAsciiToPre } from '../lib/videoRender'
 import { paintAsciiToCanvas, pickSupportedMime } from '../lib/asciiCanvas'
-import { copyText, downloadNodeAsPng, downloadText } from '../lib/export'
+import { copyText, downloadAsciiPng, downloadText } from '../lib/export'
 import { cn } from '../lib/cn'
 
 const DENSITY_KEYS = Object.keys(DENSITY_PRESETS) as DensityKey[]
@@ -272,7 +272,8 @@ export default function VideoAscii() {
   }
 
   const handleDownloadPng = () => {
-    if (preRef.current) downloadNodeAsPng(preRef.current, 'miascii-frame.png')
+    const r = lastResultRef.current
+    if (r && preRef.current) downloadAsciiPng(r, preRef.current, 'miascii-frame.png')
   }
 
   // Recording: start/stop MediaRecorder against the render canvas

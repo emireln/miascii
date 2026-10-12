@@ -11,7 +11,7 @@ import {
   renderFiglet,
   type KerningMethod,
 } from '../lib/figlet'
-import { copyText, downloadNodeAsPng, downloadText } from '../lib/export'
+import { copyText, downloadAsciiPng, downloadText } from '../lib/export'
 
 const EXAMPLES = ['miascii', 'hello world', 'ascii > pixels', '2026', 'terminal']
 
@@ -267,7 +267,7 @@ export default function TextAscii() {
             </button>
             <button
               className="pixel-btn !py-0.5 !px-2 !text-sm"
-              onClick={() => preRef.current && downloadNodeAsPng(preRef.current, 'miascii-text.png')}
+              onClick={() => preRef.current && downloadAsciiPng({ text: output, cols, rows: lines, colors: null }, preRef.current, 'miascii-text.png')}
               disabled={!output}
             >
               <ImageIcon size={12} />
