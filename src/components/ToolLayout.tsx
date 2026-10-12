@@ -18,7 +18,7 @@ export default function ToolLayout({
       {top && <div className="tool-top">{top}</div>}
       <div className="tool-body">
         <section className="tool-output">{output}</section>
-        <aside className="tool-controls">{controls}</aside>
+        <aside className="tool-side">{controls}</aside>
       </div>
     </div>
   )

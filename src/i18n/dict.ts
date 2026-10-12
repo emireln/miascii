@@ -123,7 +123,7 @@ const en: Dict = {
   // Text module
   'text.input.label': 'input',
   'text.input.placeholder': 'enter text...',
-  'text.input.hint': 'type below — live preview',
+  'text.input.hint': 'live preview as you type',
   'text.font.label': 'figlet font',
   'text.font.random': 'random font',
   'text.case.label': 'case',

@@ -646,3 +646,64 @@ input[type="color"] { cursor: pointer; }
 .dropzone-hint { color: var(--dim); font-size: 1.05rem; }
 .dropzone:hover .dropzone-hint,
 .dropzone[data-drag='true'] .dropzone-hint { color: inherit; }
+
+/* ------------------------------------------------------------------------ */
+/* Tool layout: input band, two panes, full-height output on wide windows   */
+/* ------------------------------------------------------------------------ */
+
+.tool { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.tool-top { flex: 0 0 auto; }
+.tool-body { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.tool-output { display: flex; flex-direction: column; gap: 10px; min-width: 0; min-height: 0; }
+.tool-output > .ascii-screen { min-height: 46vh; }
+.tool-side {
+  min-width: 0;
+  padding: 16px;
+  background: var(--panel);
+  border: 2px solid var(--line);
+  box-shadow: 4px 4px 0 var(--shadow);
+}
+
+.input-band { display: flex; flex-direction: column; gap: 10px; padding: 14px 16px; }
+.input-band-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 12px; }
+.input-band-hint { color: var(--dim); font-size: 1.1rem; }
+.input-textarea {
+  min-height: 3.2rem;
+  padding: 8px 10px;
+  resize: vertical;
+  font-size: 1.6rem;
+  line-height: 1.1;
+  background: var(--panel-2);
+  border: 2px solid var(--line);
+  box-shadow: inset 2px 2px 0 var(--shadow);
+}
+.chip-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.font-row { display: flex; align-items: flex-end; gap: 8px; }
+.font-picker { flex: 1 1 auto; min-width: 0; }
+.font-random { flex: 0 0 auto; }
+.ctl-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding-top: 14px;
+  border-top: 2px dashed var(--line);
+  color: var(--dim);
+  font-size: 1.1rem;
+}
+
+@media (min-width: 1100px) {
+  .app-content { display: flex; flex-direction: column; overflow: hidden; }
+  .content-wrap { display: flex; flex: 1; min-height: 0; flex-direction: column; }
+  .tool { flex: 1 1 auto; min-height: 0; }
+  .tool-body {
+    display: grid;
+    flex: 1 1 auto;
+    grid-template-columns: minmax(280px, 340px) minmax(0, 1fr);
+    grid-template-rows: minmax(0, 1fr);
+    gap: 24px;
+    min-height: 0;
+  }
+  .tool-side { grid-column: 1; grid-row: 1; min-height: 0; overflow: auto; }
+  .tool-output { grid-column: 2; grid-row: 1; min-height: 0; }
+  .tool-output > .ascii-screen { min-height: 0; }
+}

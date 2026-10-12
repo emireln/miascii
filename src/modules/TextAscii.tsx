@@ -1,19 +1,23 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { usePersisted } from '../lib/usePersisted'
 import { useT } from '../i18n'
-import { Copy, Download, Image as ImageIcon, Eraser, Dice5 } from 'lucide-react'
+import { Dice5, Download, Eraser, Image as ImageIcon } from 'lucide-react'
 import AsciiOutput from '../components/AsciiOutput'
-import { Label, Slider, Toggle } from '../components/Control'
+import { Label, Section, Slider, Toggle } from '../components/Control'
+import { CopyButton, OutputBar } from '../components/OutputBar'
+import Notice from '../components/Notice'
 import PixelSelect from '../components/PixelSelect'
+import ToolLayout from '../components/ToolLayout'
 import {
   FIGLET_FONTS,
   KERNING_METHODS,
   renderFiglet,
   type KerningMethod,
 } from '../lib/figlet'
-import { copyText, downloadAsciiPng, downloadText } from '../lib/export'
+import { downloadAsciiPng, downloadText } from '../lib/export'
 
 const EXAMPLES = ['miascii', 'hello world', 'ascii > pixels', '2026', 'terminal']
+const DEFAULT_FONT = 'Standard'
 
 const BORDER_STYLES = ['none', 'single', 'double', 'heavy', 'dashed', 'blocks'] as const
 type BorderStyle = (typeof BORDER_STYLES)[number]
@@ -76,10 +80,10 @@ export default function TextAscii() {
     return map[v] ?? v
   }
   const [text, setText] = usePersisted<string>('text.input', 'miascii')
-  const [font, setFont] = usePersisted<string>('text.font', 'Standard')
+  const [font, setFont] = usePersisted<string>('text.font', DEFAULT_FONT)
   // A saved font can disappear from the catalog after an upgrade; fall back
   // instead of showing "Font not found" forever.
-  const activeFont = FIGLET_FONTS.includes(font) ? font : 'Standard'
+  const activeFont = FIGLET_FONTS.includes(font) ? font : DEFAULT_FONT
   const [fontSize, setFontSize] = usePersisted<number>('text.fontSize', 14)
   const [hLayout, setHLayout] = usePersisted<KerningMethod>('text.hLayout', 'default')
   const [maxWidth, setMaxWidth] = usePersisted<number>('text.maxWidth', 120)
@@ -90,7 +94,6 @@ export default function TextAscii() {
   const [invert, setInvert] = usePersisted<boolean>('text.invert', false)
   const [output, setOutput] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [copied, setCopied] = useState(false)
   const preRef = useRef<HTMLPreElement>(null)
 
   useEffect(() => {
@@ -118,79 +121,74 @@ export default function TextAscii() {
     return () => { cancelled = true }
   }, [text, activeFont, hLayout, maxWidth, whitespaceBreak, caseMode, border, trim])
 
-  const { chars, lines, cols } = useMemo(() => {
+  const { lines, cols } = useMemo(() => {
     const lns = output ? output.split('\n') : []
     return {
-      chars: output.length,
       lines: lns.length,
       cols: lns.reduce((m, l) => Math.max(m, l.length), 0),
     }
   }, [output])
-
-  const handleCopy = async () => {
-    const ok = await copyText(output)
-    if (ok) {
-      setCopied(true)
-      setTimeout(() => setCopied(false), 1200)
-    }
-  }
 
   const randomFont = () => {
     const i = Math.floor(Math.random() * FIGLET_FONTS.length)
     setFont(FIGLET_FONTS[i])
   }
 
-  return (
-    <div className="tool-layout grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-4">
-      {/* Controls */}
-      <aside className="tool-controls pixel-panel p-4 space-y-5 h-fit">
-        <div>
-          <Label>{t('text.input.label')}</Label>
-          <div className="pixel-panel !shadow-none p-2">
-            <div className="text-[var(--dim)] text-sm mb-1">{t('text.input.hint')}</div>
-            <textarea
-              value={text}
-              onChange={(e) => setText(e.target.value)}
-              rows={3}
-              className="pixel-input resize-none w-full"
-              placeholder={t('text.input.placeholder')}
-              spellCheck={false}
-              autoFocus
-            />
-          </div>
-          <div className="flex flex-wrap gap-2 mt-2">
-            {EXAMPLES.map((e) => (
-              <button key={e} className="pixel-btn !py-0.5 !px-2 !text-sm" onClick={() => setText(e)}>
-                {e}
-              </button>
-            ))}
-            <button className="pixel-btn !py-0.5 !px-2 !text-sm" onClick={() => setText('')}>
-              <Eraser size={12} />
-              {t('common.clear')}
-            </button>
-          </div>
-        </div>
+  const top = (
+    <section className="input-band pixel-panel" aria-label={t('text.input.label')}>
+      <div className="input-band-head">
+        <label htmlFor="text-input" className="pixel-label">{t('text.input.label')}</label>
+        <span className="input-band-hint">{t('text.input.hint')}</span>
+      </div>
+      <textarea
+        id="text-input"
+        value={text}
+        onChange={(e) => setText(e.target.value)}
+        rows={2}
+        className="pixel-input input-textarea"
+        placeholder={t('text.input.placeholder')}
+        spellCheck={false}
+        autoFocus={window.matchMedia('(pointer: fine)').matches}
+      />
+      <div className="chip-row">
+        {EXAMPLES.map((e) => (
+          <button key={e} type="button" className="pixel-btn pixel-btn--sm" onClick={() => setText(e)}>
+            {e}
+          </button>
+        ))}
+        <button type="button" className="pixel-btn pixel-btn--sm" onClick={() => setText('')}>
+          <Eraser size={12} aria-hidden="true" />
+          {t('common.clear')}
+        </button>
+      </div>
+    </section>
+  )
 
-        <div>
-          <Label>{t('text.font.label')}</Label>
-          <div className="flex gap-2">
-            <div className="flex-1 min-w-0">
-              <PixelSelect value={activeFont} onChange={setFont} options={FIGLET_FONTS} />
-            </div>
-            <button
-              className="pixel-btn !px-2"
-              onClick={randomFont}
-              title={t('text.font.random')}
-              aria-label={t('text.font.random')}
-            >
-              <Dice5 size={14} />
-            </button>
+  const controls = (
+    <>
+      <Section title={t('section.font')}>
+        <div className="font-row">
+          <div className="font-picker">
+            <Label>{t('text.font.label')}</Label>
+            <PixelSelect label={t('text.font.label')} value={activeFont} onChange={setFont} options={FIGLET_FONTS} />
           </div>
+          <button
+            type="button"
+            className="pixel-btn font-random"
+            onClick={randomFont}
+            title={t('text.font.random')}
+            aria-label={t('text.font.random')}
+          >
+            <Dice5 size={14} aria-hidden="true" />
+          </button>
         </div>
+      </Section>
 
+      <Section title={t('section.layout')}>
         <div>
           <Label>{t('text.case.label')}</Label>
           <PixelSelect
+            label={t('text.case.label')}
             value={caseMode}
             onChange={(v) => setCaseMode(v as CaseMode)}
             options={CASE_MODES}
@@ -198,96 +196,83 @@ export default function TextAscii() {
             labelOf={caseLabel}
           />
         </div>
-
         <div>
           <Label>{t('text.hLayout.label')}</Label>
           <PixelSelect
+            label={t('text.hLayout.label')}
             value={hLayout}
             onChange={(v) => setHLayout(v as KerningMethod)}
             options={KERNING_METHODS}
             searchable={false}
           />
         </div>
-
-        <div>
-          <Label>{t('text.border.label')}</Label>
-          <PixelSelect
-            value={border}
-            onChange={(v) => setBorder(v as BorderStyle)}
-            options={BORDER_STYLES}
-            searchable={false}
-            labelOf={borderLabel}
-          />
-        </div>
-
         <div>
           <Label>{t('text.maxWidth', { cols: maxWidth })}</Label>
-          <Slider value={maxWidth} onChange={setMaxWidth} min={40} max={300} step={10} />
+          <Slider value={maxWidth} onChange={setMaxWidth} min={40} max={300} step={10} label={t('text.maxWidth', { cols: maxWidth })} />
         </div>
+        <Toggle value={whitespaceBreak} onChange={setWhitespaceBreak} label={t('text.wrapAtSpaces')} />
+        <Toggle value={trim} onChange={setTrim} label={t('text.trimWhitespace')} />
+      </Section>
 
+      <Section title={t('text.border.label')}>
+        <PixelSelect
+          label={t('text.border.label')}
+          value={border}
+          onChange={(v) => setBorder(v as BorderStyle)}
+          options={BORDER_STYLES}
+          searchable={false}
+          labelOf={borderLabel}
+        />
+      </Section>
+
+      <Section title={t('section.view')}>
         <div>
           <Label>{t('text.renderSize', { px: fontSize })}</Label>
-          <Slider value={fontSize} onChange={setFontSize} min={6} max={28} />
+          <Slider value={fontSize} onChange={setFontSize} min={6} max={28} label={t('text.renderSize', { px: fontSize })} />
         </div>
+        <Toggle value={invert} onChange={setInvert} label={t('text.invertColors')} />
+      </Section>
 
-        <div className="space-y-2">
-          <Toggle value={whitespaceBreak} onChange={setWhitespaceBreak} label={t('text.wrapAtSpaces')} />
-          <Toggle value={trim} onChange={setTrim} label={t('text.trimWhitespace')} />
-          <Toggle value={invert} onChange={setInvert} label={t('text.invertColors')} />
-        </div>
-
-        <div className="divider pt-4 text-[var(--dim)] text-sm space-y-0.5">
-          <div>{t('text.statsFont', { font: activeFont })}</div>
-          <div>{t('text.statsSize', { cols, lines, chars })}</div>
-        </div>
-      </aside>
-
-      {/* Output — sticks in place while sidebar scrolls */}
-      <section className="tool-preview min-w-0 space-y-2 lg:sticky lg:top-0 lg:self-start lg:max-h-[calc(100vh-6rem)] lg:flex lg:flex-col">
-        <div className="flex items-center justify-between gap-2 flex-wrap">
-          <div className="text-xs font-semibold tracking-wide text-[var(--mid)]">
-            {t('text.output.title')}
-          </div>
-          <div className="flex items-center gap-2">
-            <button
-              className="pixel-btn !py-0.5 !px-2 !text-sm"
-              onClick={handleCopy}
-              disabled={!output}
-            >
-              <Copy size={12} />
-              {copied ? t('common.copied') : t('common.copy')}
-            </button>
-            <button
-              className="pixel-btn !py-0.5 !px-2 !text-sm"
-              onClick={() => downloadText(output, 'miascii-text.txt')}
-              disabled={!output}
-            >
-              <Download size={12} />
-              .txt
-            </button>
-            <button
-              className="pixel-btn !py-0.5 !px-2 !text-sm"
-              onClick={() => preRef.current && downloadAsciiPng({ text: output, cols, rows: lines, colors: null }, preRef.current, 'miascii-text.png')}
-              disabled={!output}
-            >
-              <ImageIcon size={12} />
-              .png
-            </button>
-          </div>
-        </div>
-        <div
-          className="lg:flex-1 lg:min-h-0 lg:flex"
-          style={invert ? { filter: 'invert(1)' } : undefined}
-        >
-          <AsciiOutput
-            ref={preRef}
-            text={output}
-            fontSize={fontSize}
-            className="min-h-[60vh] lg:min-h-0 lg:flex-1 lg:w-full"
-          />
-        </div>
-        {error && <div className="text-sm text-red-400">! {error}</div>}
-      </section>
-    </div>
+      <div className="ctl-footer">
+        <div>{t('text.statsFont', { font: activeFont })}</div>
+        <div>{t('text.statsSize', { cols, lines, chars: output.length })}</div>
+      </div>
+    </>
   )
+
+  const outputPane = (
+    <>
+      <OutputBar title={t('text.output.title')}>
+        <CopyButton getText={() => output} disabled={!output} />
+        <button
+          type="button"
+          className="pixel-btn pixel-btn--sm"
+          onClick={() => downloadText(output, 'miascii-text.txt')}
+          disabled={!output}
+        >
+          <Download size={14} aria-hidden="true" />
+          .txt
+        </button>
+        <button
+          type="button"
+          className="pixel-btn pixel-btn--sm"
+          onClick={() => preRef.current && downloadAsciiPng({ text: output, cols, rows: lines, colors: null }, preRef.current, 'miascii-text.png')}
+          disabled={!output}
+        >
+          <ImageIcon size={14} aria-hidden="true" />
+          .png
+        </button>
+      </OutputBar>
+      {error && <Notice>! {error}</Notice>}
+      <AsciiOutput
+        ref={preRef}
+        text={output}
+        empty={t('preview.empty.text')}
+        fontSize={fontSize}
+        inverted={invert}
+      />
+    </>
+  )
+
+  return <ToolLayout top={top} output={outputPane} controls={controls} />
 }
